@@ -1,0 +1,7 @@
+{
+  "uuid": "erhai-osk@local",
+  "name": "Erhai On-Screen Keyboard",
+  "description": "On-screen keyboard that injects keys via Clutter.VirtualInputDevice, so it works with Electron/Chromium apps (QQ, Chrome) that never speak text-input-v3. Lives inside the shell, so it never steals keyboard focus.",
+  "shell-version": ["50"],
+  "version": 1
+}

@@ -1,0 +1,57 @@
+#!/bin/sh
+# Post-install: take over from a hand-installed copy, refresh caches, enable.
+#
+# This package installs the extension system-wide, under
+# /usr/share/gnome-shell/extensions.  If the same uuid also exists in the
+# installing user's ~/.local/share, the shell can see two copies and the
+# user-level one wins -- which silently pins us to whatever version was there
+# before.  Move it aside (do not delete: the user may want it back).
+set -e
+
+UUID=erhai-osk@local
+PKG_VERSION=@VERSION@
+
+if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
+    RU_UID=$(id -u "$SUDO_USER" 2>/dev/null || true)
+    RU_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+
+    if [ -n "$RU_HOME" ] && [ -d "$RU_HOME/.local/share/gnome-shell/extensions/$UUID" ]; then
+        ASIDE="$RU_HOME/.local/share/gnome-shell/extensions/$UUID.hand-installed"
+        rm -rf "$ASIDE"
+        mv "$RU_HOME/.local/share/gnome-shell/extensions/$UUID" "$ASIDE"
+        chown -R "$SUDO_USER:" "$ASIDE" 2>/dev/null || true
+        echo "opd2413-keyboard: moved the hand-installed copy to"
+        echo "  $ASIDE"
+    fi
+
+    # A hand-installed desktop entry and launcher shadow the packaged ones.
+    if [ -n "$RU_HOME" ]; then
+        rm -f "$RU_HOME/.local/share/applications/opd2413-keyboard.desktop"
+    fi
+    rm -f /usr/local/bin/opd2413-keyboard
+fi
+
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database -q /usr/share/applications || true
+fi
+
+# Best effort: enable it in the session that ran the install.
+if [ -n "${RU_UID:-}" ] && [ -d "/run/user/$RU_UID" ]; then
+    su -s /bin/sh "$SUDO_USER" -c \
+        "XDG_RUNTIME_DIR=/run/user/$RU_UID gnome-extensions enable $UUID" \
+        >/dev/null 2>&1 || true
+fi
+
+cat <<EOF
+opd2413-keyboard $PKG_VERSION installed.
+
+This keyboard is a GNOME Shell extension, so it loads when the shell starts.
+Log out and back in once, then toggle it from:
+
+  * Quick Settings   ->  "Screen Keyboard" switch
+  * Application grid ->  "OPD2413-Keyboard" icon
+
+Verify:  gnome-extensions info $UUID
+EOF
+
+exit 0

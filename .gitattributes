@@ -1,0 +1,14 @@
+# 换行符：仓库内一律用 LF，避免 Windows 检出时把 shell 脚本改成 CRLF
+# （CRLF 的 .sh 在 Linux 上会报 "bad interpreter: /bin/sh^M"，直接跑不起来）
+* text=auto eol=lf
+
+# 明确这些是脚本，必须 LF
+*.sh            text eol=lf
+*.desktop       text eol=lf
+DEBIAN/*        text eol=lf
+packaging/opd2413-keyboard/DEBIAN/* text eol=lf
+
+# 二进制文件，不要做任何转换
+*.deb           binary
+*.png           binary
+*.zip           binary

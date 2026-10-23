@@ -1,0 +1,23 @@
+Package: opd2413-keyboard
+Version: 1.0
+Architecture: arm64
+Maintainer: erhai <user@opd2413.local>
+Section: utils
+Priority: optional
+Depends: gnome-shell (>= 45), gnome-shell (<< 60), libglib2.0-bin
+Recommends: ibus, ibus-libpinyin
+Description: Large on-screen keyboard for the OnePlus Pad 2 Pro
+ A GNOME Shell extension that draws a PC-style on-screen keyboard and injects
+ keys through Clutter.VirtualInputDevice, inside the compositor.
+ .
+ This is the only approach that works on GNOME Wayland: normal windows cannot
+ accept a click without stealing keyboard focus, and mutter refuses external
+ input injection (no zwp_virtual_keyboard, no wlr-layer-shell). Because the keys
+ are injected as real input events, apps that never speak zwp_text_input_v3 --
+ Chromium and Electron (Chrome, QQ) -- receive them normally.
+ .
+ Layout is PC-style with a number row, sticky modifiers, arrow keys and a
+ Chinese/English input-method toggle. Keys are sized large (24px glyphs,
+ 64px letter keys) for older users. The panel can be dragged, collapsed to a
+ thin bar, closed, and hidden from Quick Settings or the application grid.
+ It steps aside automatically when the shutdown/session dialog appears.

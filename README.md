@@ -1,0 +1,207 @@
+# opd2413-keyboard
+
+一加 Pad 2 Pro（OPD2413 / `erhai`）在 **GNOME 50 Wayland** 下可用的屏幕键盘。
+PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用抽屉里按需开关。
+
+- 实测环境：一加 Pad 2 Pro，Ubuntu 26.04.1 LTS，GNOME Shell 50.1，arm64
+- 实测应用：QQ（Electron）、Chrome、Firefox、终端 —— **均可正常输入，含中文**
+
+---
+
+## 为什么需要它
+
+平板上只有触屏，而 GNOME Wayland 下：
+
+- 点 QQ / Chrome 的输入框，**GNOME 自带屏幕键盘不弹**
+- 装第三方屏幕键盘（Onboard）能显示，**按键却进不去应用**
+
+根因有两条，都在协议层：
+
+1. **GNOME 自带键盘**只在应用调用 `zwp_text_input_v3` 时出现，而
+   Electron/Chromium 默认不实现该协议（[chromium#40113488](https://issues.chromium.org/issues/40113488)）
+2. **Wayland 禁止跨应用注入输入**：mutter 不实现 `zwp_virtual_keyboard_v1`，
+   Onboard 走 X11 `XInput`，在 Wayland 下必然失败
+
+而且**任何普通窗口都无法做到"接受点击但不抢键盘焦点"**（xdg-shell 的限制），
+所以"窗口形态的屏幕键盘"这条路在 GNOME Wayland 上走不通。
+
+---
+
+## 怎么做的
+
+一个 **GNOME Shell 扩展**，跑在 mutter 进程内部：
+
+```
+GNOME Shell 进程
+├─ St 按键图层（shell chrome，不是窗口 → 不参与焦点竞争）
+└─ Clutter.VirtualInputDevice（mutter 内部注入 → 应用当作真实键盘事件）
+```
+
+两个直接好处：
+
+- **注入不受限**：应用认不认 `text_input_v3` 都收得到按键
+- **不抢焦点**：UI 是 shell 图层不是窗口，点键盘不会让输入框失焦
+
+### 中文为什么能输入
+
+注入的是 mutter 层面的**真实键盘事件**，输入法（ibus + libpinyin）照常截获。
+输入法到应用有三条通道，只有第一条需要 `text_input_v3`：
+
+| 通道 | 谁在用 | 需要 text-input-v3 |
+|---|---|---|
+| `zwp_text_input_v3` | 原生 Wayland 的 GTK/Qt | 需要 |
+| **XIM（ibus-x11）** | **Xwayland 下的 X11 客户端** | **不需要** |
+| ibus GTK 模块 | GTK 应用 | 不需要 |
+
+所以 Electron 应用跑在 Xwayland 下就能输中文。键盘右下角的 **中/英** 键发
+`Super+Space` 切换输入源。
+
+> 这一条是本项目的关键发现：曾经一度判定"Electron 不支持 text-input，
+> 所以中文无解"，实际上走的是 XIM 那条路。
+
+---
+
+## 功能
+
+| 功能 | 入口 |
+|---|---|
+| 显示/隐藏 | 系统菜单「屏幕键盘」/ 应用抽屉 `OPD2413-Keyboard` / 键盘上的 `✕` |
+| 收起成细条 | 拖动条 `⌄` / `⌃` |
+| 拖动定位 | 按住拖动条 `⠿ 拖动`（位置跨登录记忆） |
+| 中/英切换 | 右下 `中/英` 键 |
+| 粘滞修饰键 | `Ctrl` `Alt` `⊞` `Shift` `Caps`（点一次作用于下一个键） |
+| 上档符号 | `Shift` + 数字/符号键 |
+| 模态对话框自动让开 | 关机/重启/注销对话框出现时键盘自动隐藏，关闭后恢复 |
+
+布局：
+
+```
+Esc  `~  1!  2@  3#  4$  5%  6^  7&  8*  9(  0)  -_  =+   ⌫
+Tab   q w e r t y u i o p  [{  ]}  \|                  Del
+Caps   a s d f g h j k l  ;:  '"                      ⏎
+Shift   z x c v b n m  ,<  .>  /?                    ↑  Shift
+Ctrl  Alt  ⊞        [     空格     ]   中/英  Ctrl  ← ↓ →
+```
+
+尺寸按老年用户标准：字母键 64px 宽、字号 24px，面板约 **1310×487**
+（逻辑分辨率 1734×1213）。
+
+---
+
+## 安装
+
+```bash
+sudo apt install ./dist/opd2413-keyboard_1.0_arm64.deb
+```
+
+装完**注销重新登录一次**（GNOME 只在 shell 启动时扫描扩展目录）。
+
+之后两种方式开关键盘：
+
+- 右上角系统菜单 → **屏幕键盘** 开关
+- 应用抽屉 → **OPD2413-Keyboard** 图标
+
+卸载：
+
+```bash
+sudo apt remove opd2413-keyboard
+```
+
+用户配置 `~/.config/erhai-osk/`（位置、开关状态）会保留。
+
+> 若机器上装过旧的 `1.0.0` 包，`1.0` 会被 dpkg 视为降级，需要
+> `sudo apt install -y --allow-downgrades ./dist/opd2413-keyboard_1.0_arm64.deb`。
+
+### 从源码构建
+
+需要 `dpkg-deb`（无需 debhelper）：
+
+```bash
+sh packaging/build-deb.sh
+# → dist/opd2413-keyboard_1.0_arm64.deb
+```
+
+版本号与架构都取自 `packaging/opd2413-keyboard/DEBIAN/control`，
+产物文件名自动跟随。
+
+---
+
+## 目录结构
+
+```
+dist/                        构建产物 (.deb)
+packaging/
+  build-deb.sh               打包脚本
+  README.md                  打包说明（构建、命名、已知限制）
+  opd2413-keyboard/DEBIAN/   control / postinst / postrm
+scripts/
+  erhai-osk-ext/             扩展源码
+    extension.js
+    metadata.json
+  opd2413-keyboard-toggle.sh 应用图标调用的开关脚本
+  opd2413-keyboard.desktop   应用抽屉入口
+docs/
+  屏幕键盘-方案.md            完整方案：逐条排查、实现细节、全部踩坑
+```
+
+---
+
+## 实现要点（踩过的坑）
+
+这些是实际调试中踩出来并修掉的，详细记录见
+[`docs/屏幕键盘-方案.md`](docs/屏幕键盘-方案.md)：
+
+1. **`addTopChrome(actor, params)` 不能传 `affectsInputRegion`**
+   GNOME 50 已移除该参数。传了会抛异常，但 actor **已经半加入** chrome 层，
+   留下一个覆盖全屏、又不受 GNOME 键盘模块管理的图层 —— 表现为"画面在动但
+   输入全死"，注销时 shell 还会卡到被 systemd `SIGKILL`。
+   **正确做法：不传参数。**
+
+2. **mutter 不实现 `wlr-layer-shell`**，`gtk4-layer-shell` 无法工作。
+
+3. **`notify_keyval()` 不套用 shift level**
+   直接送 `!` 的 keysym 会打出 `1`。上档字符必须发**基键 + 真按 `Shift_L`**。
+
+4. **切换 Caps/Shift 时不要销毁重建按键**
+   触摸的按下与抬起之间若重建控件，抬起事件可能落到同位置的另一个按钮，
+   触发多余的 `clicked`（表现为莫名冒出一个字符）。改为就地更新
+   `label.text` / `style`。
+
+5. **模态对话框会盖住键盘**
+   shell 启动时就把 `modalDialogGroup` 加入 `uiGroup`，而 `addTopChrome`
+   是后来追加的，所以键盘在对话框之上；同时对话框 `pushModal` 抢输入，
+   形成"关不掉也点不到"。**听 `child-added` 信号无效**（对话框启动时就构造好，
+   之后只改可见性），正解是轮询 `modalDialogGroup` 的可见子节点。
+
+6. **两个控制入口必须落在同一个状态上**
+   早期应用图标走 `gnome-extensions enable/disable`、系统菜单走"隐藏面板"，
+   两套状态导致"要点两下才生效"。改为共用状态文件
+   `~/.config/erhai-osk/visible`。
+
+7. **粘滞修饰键会和全局快捷键打架**
+   `⊞`（Super）是粘滞键，点 `⊞` 再点空格 = `Super+Space` = 切换输入法，
+   会误切换。务必定做成独立按键、直接发完整组合键。
+
+---
+
+## 已知限制
+
+- 只支持 GNOME 45+（用了 ESM 扩展 API 与 `Clutter.VirtualInputDevice`），
+  实测 GNOME 50.1
+- 扩展代码在 shell 启动时加载，**改动后必须注销重登**；
+  GNOME 50 的 `ReloadExtension` 未实现、`Eval` 已禁用，没有热重载办法
+- **GDM 登录界面没有屏幕键盘**（greeter 是独立用户，看不到用户扩展）
+- 没有长按重复
+- 当前包标注 `Architecture: arm64`；包内实际无架构相关文件，
+  需要跨架构可改回 `all`
+
+---
+
+## 相关文档
+
+- [`docs/屏幕键盘-方案.md`](docs/屏幕键盘-方案.md) —— 完整技术方案与踩坑记录
+- [`packaging/README.md`](packaging/README.md) —— 打包说明
+
+## 许可
+
+[MIT](LICENSE)
