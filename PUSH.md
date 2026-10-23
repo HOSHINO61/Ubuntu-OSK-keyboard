@@ -41,6 +41,36 @@ git remote add gitee  git@gitee.com:HOSHINO6/opd2413-keyboard.git
 
 ---
 
+## ⚠️ 两个仓库的提交历史是有意分叉的
+
+内容完全一致（同一份文件树），但**提交 SHA 不同**，因为作者署名要各随其平台：
+
+| 平台 | 作者 | 说明 |
+|---|---|---|
+| Gitee | `小鸟游星野 <HOSHINO6@users.noreply.gitee.com>` | Gitee 的邮箱隐私保护会拒收真实邮箱 |
+| GitHub | `ホシノ <186796588+HOSHINO61@users.noreply.github.com>` | 用 GitHub 的 no-reply，提交才会关联到账号 |
+
+一个提交只能带一个作者，所以两边不可能既各自归属、又共享同一 SHA。
+分叉是刻意选择的结果，不是弄错了。
+
+### 同步流程
+
+在 `master` 上正常提交（会以 Gitee 身份），推到 Gitee，然后重建 GitHub 侧：
+
+```bash
+git commit -am "改动说明"
+git push origin master          # Gitee
+
+sh scripts/sync-github.sh --push   # 重建 gh 分支并以 GitHub 身份强推
+```
+
+脚本会逐个提交重放、换成 GitHub 身份、校验文件树与 `master` 一致，再把
+`v1.0` tag 指到重写后的首个提交上。**若文件树对不上，脚本会中止**。
+
+> 不要直接 `git push github master`，那样会把 Gitee 的邮箱带过去。
+
+---
+
 ## 认证
 
 **GitHub** — SSH 公钥：<https://github.com/settings/keys>
