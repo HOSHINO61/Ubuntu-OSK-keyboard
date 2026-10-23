@@ -145,6 +145,22 @@ sh packaging/build-deb.sh
 版本号与架构都取自 `packaging/opd2413-keyboard/DEBIAN/control`，
 产物文件名自动跟随。
 
+### 换行符（重要）
+
+`.gitattributes` 强制 `eol=lf`，这是刻意的：
+
+- `scripts/*.sh`、`packaging/opd2413-keyboard/DEBIAN/*` 是 Linux 脚本，
+  若被检出成 CRLF，运行时报 `bad interpreter: /bin/sh^M`，安装会直接失败
+- `*.deb` 标为 `binary`，不做任何转换
+
+在 Windows 上克隆后如果不小心改坏了换行符，可以这样检查：
+
+```bash
+git ls-files --eol scripts/ packaging/opd2413-keyboard/DEBIAN/
+```
+
+**不要删除 `.gitattributes`**，也不要用白名单式 `.gitignore` 把它排除掉。
+
 ---
 
 ## 目录结构
@@ -152,7 +168,6 @@ sh packaging/build-deb.sh
 ```
 README.md                    本文件
 LICENSE                      MIT
-PUSH.md                      发布与推送说明（双平台、认证、发行流程）
 .gitattributes               强制 LF 换行（见下文「换行符」）
 dist/                        构建产物 (.deb)
 packaging/
@@ -165,6 +180,7 @@ scripts/
     metadata.json
   opd2413-keyboard-toggle.sh 应用图标调用的开关脚本
   opd2413-keyboard.desktop   应用抽屉入口
+  sync-github.sh             把 master 重放为 GitHub 身份并强推（见下文）
 docs/
   屏幕键盘-方案.md            完整方案：逐条排查、实现细节、全部踩坑
 ```
