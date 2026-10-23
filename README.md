@@ -7,7 +7,9 @@ PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用
 - 实测应用：QQ（Electron）、Chrome、Firefox、终端 —— **均可正常输入，含中文**
 
 > **中国大陆用户建议访问 [Gitee 镜像](https://gitee.com/HOSHINO6/opd2413-keyboard)**，
-> 下载速度更快、连接更稳定。两个仓库内容对等，均可使用。
+> 下载更快、连接更稳定；
+> **海外用户建议使用 [GitHub](https://github.com/HOSHINO61/opd2413-keyboard)**。
+> 两个仓库内容对等，均可使用。
 
 ---
 
