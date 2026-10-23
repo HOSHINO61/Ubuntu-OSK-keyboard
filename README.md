@@ -6,6 +6,9 @@ PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用
 - 实测环境：一加 Pad 2 Pro，Ubuntu 26.04.1 LTS，GNOME Shell 50.1，arm64
 - 实测应用：QQ（Electron）、Chrome、Firefox、终端 —— **均可正常输入，含中文**
 
+> **中国大陆用户建议访问 [Gitee 镜像](https://gitee.com/HOSHINO6/opd2413-keyboard)**，
+> 下载速度更快、连接更稳定。两个仓库内容对等，均可使用。
+
 ---
 
 ## 为什么需要它
@@ -129,6 +132,10 @@ sh packaging/build-deb.sh
 ## 目录结构
 
 ```
+README.md                    本文件
+LICENSE                      MIT
+PUSH.md                      发布与推送说明（双平台、认证、发行流程）
+.gitattributes               强制 LF 换行（见下文「换行符」）
 dist/                        构建产物 (.deb)
 packaging/
   build-deb.sh               打包脚本
