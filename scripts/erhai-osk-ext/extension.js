@@ -49,7 +49,7 @@ const XK = {
 
 const POS_FILE = 'erhai-osk/position.kf';
 // Shared on/off state: the app launcher writes it, the extension watches it, so
-// the Quick Settings switch and the OSK-Keyboard icon act on the SAME axis.
+// the Quick Settings switch and the PAD-OSK icon act on the SAME axis.
 const STATE_FILE = 'erhai-osk/visible';
 
 // ---- styling ---------------------------------------------------------

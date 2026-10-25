@@ -1,4 +1,4 @@
-# OSK-Keyboard
+# PAD-OSK
 
 一加 Pad 2 Pro（OPD2413 / `erhai`）在 **GNOME 50 Wayland** 下可用的屏幕键盘，其它平板请自测。
 PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用抽屉里按需开关。
@@ -6,9 +6,9 @@ PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用
 - 实测环境：一加 Pad 2 Pro，Ubuntu 26.04.1 LTS，GNOME Shell 50.1，arm64
 - 实测应用：QQ（Electron）、Chrome、Firefox、终端 —— **均可正常输入，含中文**
 
-> **中国大陆用户建议访问 [Gitee 镜像](https://gitee.com/HOSHINO6/Ubuntu-OSK-keyboard)**，
+> **中国大陆用户建议访问 [Gitee 镜像](https://gitee.com/HOSHINO6/ubuntu-pad-keyboard)**，
 > 下载更快、连接更稳定；
-> **海外用户建议使用 [GitHub](https://github.com/HOSHINO61/Ubuntu-OSK-keyboard)**。
+> **海外用户建议使用 [GitHub](https://github.com/HOSHINO61/ubuntu-pad-keyboard)**。
 > 两个仓库内容对等，均可使用。
 
 ---
@@ -88,7 +88,7 @@ GNOME Shell 进程
 
 | 功能 | 入口 |
 |---|---|
-| 显示/隐藏 | 系统菜单「屏幕键盘」/ 应用抽屉 `OSK-Keyboard` / 键盘上的 `✕` |
+| 显示/隐藏 | 系统菜单「屏幕键盘」/ 应用抽屉 `PAD-OSK` / 键盘上的 `✕` |
 | 收起成细条 | 拖动条 `⌄` / `⌃` |
 | 键盘尺寸 | 拖动条右侧 `小` `中` `大`（三档，跨登录记忆） |
 | 拖动定位 | 按住拖动条 `⠿ 拖动`（位置跨登录记忆） |
@@ -160,7 +160,7 @@ scale_large=1.00
 ## 安装
 
 ```bash
-sudo apt install ./dist/osk-keyboard_1.0.1b_arm64.deb
+sudo apt install ./dist/pad-osk_0.Demo_arm64.deb
 ```
 
 装完建议**重启**（不建议只注销：部分设备的 gdm 登录界面偶发黑屏 + 触屏失效）。
@@ -169,23 +169,23 @@ GNOME 只在 shell 启动时扫描扩展目录，所以必须重启一次会话�
 之后两种方式开关键盘：
 
 - 右上角系统菜单 → **屏幕键盘** 开关
-- 应用抽屉 → **OSK-Keyboard** 图标
+- 应用抽屉 → **PAD-OSK** 图标
 
 卸载：
 
 ```bash
-sudo apt remove osk-keyboard
+sudo apt remove pad-osk
 ```
 
 用户配置 `~/.config/erhai-osk/`（位置、开关状态）会保留。
 
-> **从旧包升级**：v1.0.x 的包名是 `opd2413-keyboard`，从 1.0.1b 起改为
-> `osk-keyboard`。control 里带了 `Conflicts`/`Replaces`，正常 `apt install` 会自动
+> **从旧包升级**：v1.0.x 的包名是 `opd2413-keyboard`，从 Demo 起改为
+> `pad-osk`。control 里带了 `Conflicts`/`Replaces`，正常 `apt install` 会自动
 > 卸掉旧包；如果用的是裸 `dpkg -i`，先手动卸一次：
 >
 > ```bash
 > sudo apt remove opd2413-keyboard
-> sudo apt install ./dist/osk-keyboard_1.0.1b_arm64.deb
+> sudo apt install ./dist/pad-osk_0.Demo_arm64.deb
 > ```
 >
 > 扩展 UUID（`erhai-osk@local`）和配置目录（`~/.config/erhai-osk/`）都没变，
@@ -197,24 +197,24 @@ sudo apt remove osk-keyboard
 
 ```bash
 sh packaging/build-deb.sh
-# → dist/osk-keyboard_1.0.1b_arm64.deb
+# → dist/pad-osk_0.Demo_arm64.deb
 ```
 
-版本号与架构都取自 `packaging/osk-keyboard/DEBIAN/control`，
+版本号与架构都取自 `packaging/pad-osk/DEBIAN/control`，
 产物文件名自动跟随。
 
 ### 换行符（重要）
 
 `.gitattributes` 强制 `eol=lf`，这是刻意的：
 
-- `scripts/*.sh`、`packaging/osk-keyboard/DEBIAN/*` 是 Linux 脚本，
+- `scripts/*.sh`、`packaging/pad-osk/DEBIAN/*` 是 Linux 脚本，
   若被检出成 CRLF，运行时报 `bad interpreter: /bin/sh^M`，安装会直接失败
 - `*.deb` 标为 `binary`，不做任何转换
 
 在 Windows 上克隆后如果不小心改坏了换行符，可以这样检查：
 
 ```bash
-git ls-files --eol scripts/ packaging/osk-keyboard/DEBIAN/
+git ls-files --eol scripts/ packaging/pad-osk/DEBIAN/
 ```
 
 **不要删除 `.gitattributes`**，也不要用白名单式 `.gitignore` 把它排除掉。
@@ -231,13 +231,13 @@ dist/                        构建产物 (.deb)
 packaging/
   build-deb.sh               打包脚本
   README.md                  打包说明（构建、命名、已知限制）
-  osk-keyboard/DEBIAN/   control / postinst / postrm
+  pad-osk/DEBIAN/   control / postinst / postrm
 scripts/
   erhai-osk-ext/             扩展源码
     extension.js
     metadata.json
-  osk-keyboard-toggle.sh 应用图标调用的开关脚本
-  osk-keyboard.desktop   应用抽屉入口
+  pad-osk-toggle.sh 应用图标调用的开关脚本
+  pad-osk.desktop   应用抽屉入口
   sync-github.sh             把 master 重放为 GitHub 身份并强推（见下文）
 docs/
   屏幕键盘-方案.md            完整方案：逐条排查、实现细节、全部踩坑

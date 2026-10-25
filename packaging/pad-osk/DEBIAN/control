@@ -1,8 +1,8 @@
-Package: osk-keyboard
-Version: 1.0.1b
+Package: pad-osk
+Version: 0.Demo
 Architecture: arm64
-Conflicts: opd2413-keyboard
-Replaces: opd2413-keyboard
+Conflicts: opd2413-keyboard, osk-keyboard
+Replaces: opd2413-keyboard, osk-keyboard
 Maintainer: erhai <user@opd2413.local>
 Section: utils
 Priority: optional

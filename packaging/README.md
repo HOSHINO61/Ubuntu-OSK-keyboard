@@ -1,6 +1,6 @@
-# 打包说明：osk-keyboard
+# 打包说明：pad-osk
 
-屏幕键盘的 Debian 包。源码在 `scripts/`，包定义为 `packaging/osk-keyboard/`，
+屏幕键盘的 Debian 包。源码在 `scripts/`，包定义为 `packaging/pad-osk/`，
 产物在 `dist/`。
 
 ---
@@ -26,18 +26,18 @@
 sh packaging/build-deb.sh
 ```
 
-产物：`dist/osk-keyboard_<版本>_<架构>.deb`
+产物：`dist/pad-osk_<版本>_<架构>.deb`
 
 脚本做的事：
 
 1. 从 `DEBIAN/control` 读版本号与架构
-2. 把 `scripts/` 里的源文件复制进 `packaging/osk-keyboard/usr/`：
+2. 把 `scripts/` 里的源文件复制进 `packaging/pad-osk/usr/`：
 
    | 源 | 目标 |
    |---|---|
    | `scripts/erhai-osk-ext/extension.js`、`metadata.json` | `/usr/share/gnome-shell/extensions/erhai-osk@local/` |
-   | `scripts/osk-keyboard-toggle.sh` | `/usr/bin/osk-keyboard` |
-   | `scripts/osk-keyboard.desktop` | `/usr/share/applications/` |
+   | `scripts/pad-osk-toggle.sh` | `/usr/bin/pad-osk` |
+   | `scripts/pad-osk.desktop` | `/usr/share/applications/` |
 
 3. 显式 `chmod`（`dpkg-deb` 会保留目录树的权限位）
 4. 把 `postinst` 里的 `@VERSION@` 替换为真实版本
@@ -51,9 +51,9 @@ sh packaging/build-deb.sh
 ## 安装 / 卸载
 
 ```bash
-sudo apt install ./dist/osk-keyboard_1.0.1b_arm64.deb
-sudo apt remove  osk-keyboard
-sudo apt purge   osk-keyboard
+sudo apt install ./dist/pad-osk_0.Demo_arm64.deb
+sudo apt remove  pad-osk
+sudo apt purge   pad-osk
 ```
 
 ⚠️ **如果机器上装过 `1.0.0`（旧命名），升级到 `1.0` 会被当成"降级"**：
@@ -66,7 +66,7 @@ E: 降级软件包同时使用了 -y 选项，但是没有用 --allow-downgrades
 dpkg 的版本比较是**分段**的，`1.0` 比 `1.0.0` 旧。首次从旧的 `all` 包迁移时用：
 
 ```bash
-sudo apt install -y --allow-downgrades ./dist/osk-keyboard_1.0.1b_arm64.deb
+sudo apt install -y --allow-downgrades ./dist/pad-osk_0.Demo_arm64.deb
 ```
 
 之后同版本重装、或升到 `1.0.1` 都不再需要这个开关。
@@ -77,7 +77,7 @@ sudo apt install -y --allow-downgrades ./dist/osk-keyboard_1.0.1b_arm64.deb
 
 ## 命名约定
 
-`osk-keyboard_<版本>_<架构>.deb`，版本与架构都直接来自 `DEBIAN/control`，
+`pad-osk_<版本>_<架构>.deb`，版本与架构都直接来自 `DEBIAN/control`，
 改 `control` 就同时改了文件名和包内字段，两者不会脱节。
 
 当前为 `1.0` + `arm64`。注意 `Architecture: arm64` 会让 dpkg **拒绝在 x86
@@ -96,15 +96,15 @@ sudo apt install -y --allow-downgrades ./dist/osk-keyboard_1.0.1b_arm64.deb
 
 `postinst` 的处理：把用户级副本**改名**为 `erhai-osk@local.hand-installed`
 而不是删除（用户可能想回溯），然后清掉会遮蔽包内文件的
-`/usr/local/bin/osk-keyboard` 和 `~/.local/share/applications/osk-keyboard.desktop`。
+`/usr/local/bin/pad-osk` 和 `~/.local/share/applications/pad-osk.desktop`。
 
 ### 2. 桌面项的 `Exec=` 不能写死路径
 
-原先是 `Exec=/usr/local/bin/osk-keyboard`。改成 deb 后启动器在 `/usr/bin`，
+原先是 `Exec=/usr/local/bin/pad-osk`。改成 deb 后启动器在 `/usr/bin`，
 按 Debian 惯例应当**不带路径**、依赖 `PATH`：
 
 ```ini
-Exec=osk-keyboard
+Exec=pad-osk
 ```
 
 ### 3. 卸载不要碰用户数据
@@ -118,15 +118,15 @@ Exec=osk-keyboard
 ## 验证记录（2026-10-23，实机）
 
 ```
-构建      osk-keyboard_1.0.1b_arm64.deb（10,980 字节）
-安装      dpkg -l → ii  osk-keyboard 1.0 arm64
+构建      pad-osk_0.Demo_arm64.deb（10,980 字节）
+安装      dpkg -l → ii  pad-osk 1.0 arm64
 字段      Version: 1.0    Architecture: arm64   （与文件名一致）
-文件      /usr/bin/osk-keyboard, /usr/share/applications/…,
+文件      /usr/bin/pad-osk, /usr/share/applications/…,
           /usr/share/gnome-shell/extensions/erhai-osk@local/{extension.js,metadata.json}
 手抄本    已移到 erhai-osk@local.hand-installed
-旧启动器  /usr/local/bin/osk-keyboard 已移除
+旧启动器  /usr/local/bin/pad-osk 已移除
 旧桌面项  ~/.local/share/applications/… 已移除
-启动器    osk-keyboard → keyboard on / keyboard off（往返正常）
+启动器    pad-osk → keyboard on / keyboard off（往返正常）
 卸载      系统目录与启动器清空，~/.config/erhai-osk/ 保留
 重装      回到 ii 状态
 ```
@@ -135,7 +135,7 @@ Exec=osk-keyboard
 
 ## 改版本号
 
-改 `packaging/osk-keyboard/DEBIAN/control` 里的 `Version:`（和需要时的
+改 `packaging/pad-osk/DEBIAN/control` 里的 `Version:`（和需要时的
 `Architecture:`），重新构建即可。`postinst` 里的版本是构建时替换的，不要手写。
 
 ---

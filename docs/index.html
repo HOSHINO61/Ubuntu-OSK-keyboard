@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PAD-OSK — arm64 版 Ubuntu 的屏幕键盘（GNOME 50 Wayland）</title>
+<meta name="description" content="PAD-OSK 是给 arm64 版 Ubuntu（GNOME 50 Wayland）用的屏幕键盘：按键在合成器内部通过 Clutter.VirtualInputDevice 注入，Electron / Chromium 应用照常收字；UI 是 shell 图层，永不抢焦点。支持中文输入与三档尺寸，任何 arm64 平板都能装。">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PAD-OSK — 装进 Ubuntu 里的屏幕键盘">
+<meta property="og:description" content="arm64 版 Ubuntu · GNOME 50 Wayland。合成器内注入按键、不抢焦点、支持中文输入，三档尺寸。">
+<meta property="og:url" content="https://mybailu.cn/osk/">
+<meta property="og:site_name" content="PAD-OSK">
+<meta property="og:image" content="https://mybailu.cn/osk/assets/img/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mybailu.cn/osk/assets/img/og-cover.png">
+<link rel="canonical" href="https://mybailu.cn/osk/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body data-title-zh="PAD-OSK — arm64 版 Ubuntu 的屏幕键盘（GNOME 50 Wayland）"
+      data-title-en="PAD-OSK — an on-screen keyboard for arm64 Ubuntu (GNOME 50 Wayland)">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-dl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16.5h.01"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></symbol>
+    <symbol id="i-sticky" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.4 3.9 5.6 3.9 9S14.5 18.6 12 21c-2.5-2.4-3.9-5.6-3.9-9S9.5 5.4 12 3z"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></symbol>
+    <symbol id="i-move" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><path d="M9.5 5.5 12 3l2.5 2.5M9.5 18.5 12 21l2.5-2.5M5.5 9.5 3 12l2.5 2.5M18.5 9.5 21 12l-2.5 2.5"/></symbol>
+    <symbol id="i-toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><circle cx="16" cy="12" r="3"/></symbol>
+    <symbol id="i-focus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
+    <symbol id="i-window" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M7 6.5h.01"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+    <symbol id="i-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7"/><path d="M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></symbol>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <img src="favicon.svg" alt="" width="26" height="26">
+      <span>PAD-OSK</span>
+      <span class="brand-sub">arm64 Ubuntu</span>
+    </a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="#why" data-en="Why">为什么</a>
+      <a href="#how" data-en="How it works">工作原理</a>
+      <a href="#sizes" data-en="Sizes">三档尺寸</a>
+      <a href="#features" data-en="Features">功能</a>
+      <a href="#install" data-en="Install">安装</a>
+      <a href="tech.html" data-en="Technical notes">技术方案</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="lang-btn" data-lang-toggle type="button" aria-label="Switch to English">EN</button>
+      <a class="btn btn-primary btn-sm" href="#download">
+        <svg aria-hidden="true"><use href="#i-dl"/></svg>
+        <span data-en="Download">下载</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="wrap hero">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="kicker"><i class="dot"></i><span data-en="arm64 tablets · GNOME 50 Wayland">arm64 平板通用 · GNOME 50 Wayland</span></span>
+        <h1 data-typewriter data-en-html="An on-screen keyboard <span class=&quot;hl&quot;>built into Ubuntu</span>">装进 Ubuntu 里的<br><span class="hl">屏幕键盘</span></h1>
+        <p class="lead" data-en="Put arm64 Ubuntu on a tablet and the touchscreen is only half useful: GNOME's own keyboard never appears in QQ or Chrome, and third-party keyboards cannot deliver a single character. PAD-OSK puts the keyboard inside GNOME Shell — keys are injected by the compositor, applications receive real keyboard events, and the keyboard itself never steals focus from the field you are typing in.">
+          arm64 版 Ubuntu 装在平板上，触屏只用得上一半：GNOME 自带的键盘在 QQ、Chrome 里弹不出来，第三方键盘又打不进字。PAD-OSK 把键盘做进 GNOME Shell —— 按键由合成器注入，应用收到的是真实键盘事件，而键盘本身永远不会抢走输入框的焦点。
+        </p>
+        <p class="hero-note">
+          <svg aria-hidden="true"><use href="#i-warn"/></svg>
+          <span data-en-html="Requires <b>GNOME 50 + Wayland</b> on an <b>arm64</b> machine. The .deb is arm64 only — <b>there is no amd64 build yet</b>.">需要 <b>GNOME 50 + Wayland</b>，且机器是 <b>arm64</b>；目前只提供 arm64 的 .deb，<b>amd64 还没有构建</b>。</span>
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#download">
+            <svg aria-hidden="true"><use href="#i-dl"/></svg>
+            <span data-en="Download .deb">下载 .deb</span>
+          </a>
+          <a class="btn btn-ghost" href="tech.html">
+            <span data-en="Learn more">了解更多</span>
+            <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </div>
+        <div class="hero-meta">
+          <span class="chip"><b>GNOME Shell 50</b></span>
+          <span class="chip"><b>arm64</b> · Wayland</span>
+          <span class="chip">MIT License</span>
+          <span class="chip"><b>vDemo</b></span>
+          <span class="chip"><b>13.7</b> KB</span>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <figure class="shot-frame" style="margin:0">
+          <img src="assets/img/hero-keyboard.webp"
+                 alt="中档键盘面板：数字行、字母区、方向键与顶部拖动条" width="1378" height="517"
+                 loading="eager" decoding="async">
+          <figcaption class="shot-cap">
+            <span class="led"><i></i><span data-en="Medium size · 66 % of screen width">中档 · 占屏宽 66 %</span></span>
+            <span data-en="Ubuntu 26.04 · GNOME 50.1">Ubuntu 26.04 · GNOME 50.1</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY ============ -->
+  <section class="section" id="why">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow" data-en="The problem">问题</p>
+        <h2 data-en="Three walls, all of them in the protocol layer">三道墙，全都砌在协议层</h2>
+        <p class="lead" data-en="A tablet has no physical keyboard, and on GNOME Wayland &quot;show a keyboard&quot; and &quot;get the characters into the app&quot; are two separate problems. Both of them fail.">
+          平板只有触屏，而在 GNOME Wayland 下，「弹出键盘」和「把字送进应用」其实是两件事——两件都失败。
+        </p>
+      </div>
+
+      <div class="grid grid-3">
+        <article class="card reveal">
+          <span class="num">01</span>
+          <h3 data-en="GNOME's keyboard never shows up">自带的键盘不出现</h3>
+          <p data-en="GNOME's on-screen keyboard only appears when an application implements zwp_text_input_v3. Electron and Chromium do not implement it by default, so tapping a text field in QQ or Chrome pops up nothing at all.">
+            GNOME 的屏幕键盘只在应用实现 <code>zwp_text_input_v3</code> 时才弹出。Electron / Chromium 默认不实现它，于是点 QQ、Chrome 的输入框，什么都不会弹。
+          </p>
+        </article>
+        <article class="card reveal">
+          <span class="num">02</span>
+          <h3 data-en="Third-party keyboards deliver nothing">第三方键盘打不进字</h3>
+          <p data-en="Onboard injects keys through X11 XInput, and Wayland forbids clients from injecting input into each other. wtype would need zwp_virtual_keyboard_v1 — mutter does not implement that either.">
+            Onboard 靠 X11 <code>XInput</code> 注入，而 Wayland 明文禁止客户端互相注入输入；<code>wtype</code> 需要的 <code>zwp_virtual_keyboard_v1</code>，mutter 根本没有实现。
+          </p>
+        </article>
+        <article class="card reveal">
+          <span class="num">03</span>
+          <h3 data-en="A normal window always steals focus">普通窗口一定抢焦点</h3>
+          <p data-en="Under xdg-shell there is no such window that accepts a click while keeping keyboard focus elsewhere. The moment you tap the keyboard, the caret leaves the text field.">
+            xdg-shell 下没有「接受点击、但不拿键盘焦点」这种窗口。手一碰键盘，输入框里的光标就消失了。
+          </p>
+        </article>
+      </div>
+
+      <div class="problem-note reveal">
+        <span class="k" data-en="The clue">线索</span>
+        <p data-en="Every failure happened at the window layer. Only the compositor itself holds both privileges at once: injecting input, and not competing for focus.">
+          所有失败都发生在「窗口」这一层。注入输入和不抢焦点，只有合成器内部同时拥有。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW ============ -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow" data-en="The approach">方案</p>
+        <h2 data-en="A GNOME Shell extension, running inside mutter">一个跑在 mutter 进程里的 shell 扩展</h2>
+        <p class="lead" data-en="The keyboard UI is a shell chrome layer, not a window. Keys go out through Clutter.VirtualInputDevice, which mutter treats exactly like a real hardware keyboard — so the application cannot tell the difference.">
+          键盘 UI 是 shell 的 chrome 图层而不是窗口；按键通过 <code>Clutter.VirtualInputDevice</code> 注入，mutter 把它当作真实硬件键盘，应用端分辨不出来。
+        </p>
+      </div>
+
+      <div class="grid grid-2" style="align-items:start;gap:20px">
+        <div class="diagram reveal" aria-hidden="true">
+          <div class="dg-row">
+            <div class="dg-box"><b>QQ · Chrome · Firefox · 终端</b><span data-en="Electron / Chromium / GTK">Electron / Chromium / GTK</span></div>
+          </div>
+          <div class="dg-arrow"><span data-en="real keyboard events — indistinguishable from hardware">真实键盘事件 · 与硬件键盘无差别</span></div>
+          <div class="dg-row">
+            <div class="dg-box hot"><b>GNOME Shell 进程（mutter）</b>
+              <span data-en="St chrome layer (keyboard UI, not a window)">St chrome 图层（键盘 UI，不是窗口）</span> ＋
+              <span data-en="Clutter.VirtualInputDevice (notify_keyval)">Clutter.VirtualInputDevice（notify_keyval）</span>
+            </div>
+          </div>
+          <div class="dg-arrow"><span data-en="a tap on a key">触摸按下按键</span></div>
+          <div class="dg-row">
+            <div class="dg-box"><b data-en="Touchscreen">触摸屏</b><span data-en="ibus + libpinyin intercepts the same events">ibus + libpinyin 截获的也是同一批事件</span></div>
+          </div>
+          <p class="dg-legend" data-en="Everything stays inside the shell process — nothing crosses an application boundary.">整条链路没有跨出 shell 进程，也没有跨应用边界。</p>
+        </div>
+
+        <div class="reveal">
+          <ul class="list" style="list-style:none;margin:0;padding:0;display:grid;gap:14px">
+            <li style="display:flex;gap:11px"><svg style="width:16px;height:16px;flex:none;margin-top:5px;color:var(--ok)" aria-hidden="true"><use href="#i-check"/></svg><span><strong data-en="Injection is unrestricted.">注入不受限。</strong><span data-en=" Whether an app speaks text-input-v3 or not, it receives the keys."> 应用认不认 text-input-v3，都收得到按键。</span></span></li>
+            <li style="display:flex;gap:11px"><svg style="width:16px;height:16px;flex:none;margin-top:5px;color:var(--ok)" aria-hidden="true"><use href="#i-check"/></svg><span><strong data-en="Focus is never stolen.">不抢焦点。</strong><span data-en=" A chrome layer does not join the focus race; tapping a key leaves the caret where it was.">  chrome 图层不参与焦点竞争，点键盘时输入框的光标原地不动。</span></span></li>
+            <li style="display:flex;gap:11px"><svg style="width:16px;height:16px;flex:none;margin-top:5px;color:var(--ok)" aria-hidden="true"><use href="#i-check"/></svg><span><strong data-en="Empty areas pass through.">空白区可穿透。</strong><span data-en=" The container is reactive: false, so only the keys take events."> 容器 <code>reactive: false</code>，只有按键接收事件，点到空白处照常落到下层窗口。</span></span></li>
+            <li style="display:flex;gap:11px"><svg style="width:16px;height:16px;flex:none;margin-top:5px;color:var(--ok)" aria-hidden="true"><use href="#i-check"/></svg><span><strong data-en="Chinese input works everywhere.">中文照打。</strong><span data-en=" ibus intercepts the same real events and reaches Xwayland apps over XIM."> 输入法截获的是同一批真实事件，走 XIM 送进 Xwayland 下的 QQ / Chrome。</span></span></li>
+          </ul>
+
+          <div class="code" style="margin-top:22px">
+            <button class="copy" type="button" aria-label="Copy code"><svg aria-hidden="true"><use href="#i-copy"/></svg></button>
+            <pre><code><span class="c">// 合成器内部注入：一行按键就是一次真事件</span>
+const seat = Clutter.get_default_backend().get_default_seat();
+const vdev = seat.create_virtual_device(
+    Clutter.InputDeviceType.KEYBOARD_DEVICE);
+const t = Clutter.get_current_event_time();
+vdev.notify_keyval(t, keysym, Clutter.KeyState.PRESSED);
+vdev.notify_keyval(t, keysym, Clutter.KeyState.RELEASED);</code></pre>
+          </div>
+
+          <a class="link-more" href="tech.html">
+            <span data-en="Full technical notes and the eleven dead ends">完整技术方案与十一条死路</span>
+            <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SIZES ============ -->
+  <section class="section" id="sizes">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow" data-en="Three sizes">三档尺寸</p>
+        <h2 data-en="Small, medium, large: 55 %, 66 %, 76 % of the screen width">小 / 中 / 大：55 % / 66 % / 76 % 屏宽</h2>
+        <p class="lead" data-en="The buttons sit at the right of the grip bar. Switching re-styles every key in place instead of rebuilding it, so a finger already on the glass never lands on a different key — and the bottom edge stays put, so the panel grows upwards. Pick whichever size suits your habit.">
+          按钮在拖动条右侧。切换时逐键就地重设样式，不重建控件——正按着的手指不会落到别的键上；底边保持不动，键盘向上生长。可按您的习惯任选一档。
+        </p>
+      </div>
+
+      <div class="size-demo reveal">
+        <div class="seg" role="tablist" aria-label="键盘尺寸">
+          <button type="button" role="tab" data-size="small" aria-selected="false"><span data-en="Small">小</span><small>55 %</small></button>
+          <button type="button" role="tab" data-size="medium" aria-selected="true"><span data-en="Medium">中</span><small>66 %</small></button>
+          <button type="button" role="tab" data-size="large" aria-selected="false"><span data-en="Large">大</span><small>76 %</small></button>
+        </div>
+        <div class="stage">
+          <div class="stage-img">
+            <img data-size-img="small" src="assets/img/quick-settings-small.webp" alt="小档键盘，占屏宽 55%" width="1600" height="1132" decoding="async" hidden>
+            <img data-size-img="medium" src="assets/img/quick-settings.webp" alt="中档键盘，占屏宽 66%" width="1600" height="1132" decoding="async">
+            <img data-size-img="large" src="assets/img/quick-settings-large.webp" alt="大档键盘，占屏宽 76%" width="1600" height="1132" decoding="async" hidden>
+          </div>
+        </div>
+        <dl class="size-stats" style="margin:0">
+          <div class="stat"><dt data-en="Step">档位</dt><dd data-size-val="name">中</dd></div>
+          <div class="stat"><dt data-en="Scale">缩放</dt><dd data-size-val="scale">0.85</dd></div>
+          <div class="stat"><dt data-en="Letter key">字母键宽</dt><dd data-size-val="keyw">54<span class="u">px</span></dd></div>
+          <div class="stat"><dt data-en="Panel / screen width">面板 · 占屏宽</dt><dd data-size-val="panel">1120×421</dd></div>
+        </dl>
+      </div>
+      <p class="kbd-note" data-en="Measured on a 1696 px logical screen width. Scale factors live in ~/.config/erhai-osk/position.kf under [layout] and range from 0.40 to 2.00 — tune them without repackaging.">
+        数值按 1696 px 逻辑屏宽实测标定。三档缩放写在 <code>~/.config/erhai-osk/position.kf</code> 的 <code>[layout]</code> 组里，范围 0.40–2.00，改完点一下尺寸按钮就生效，不用重新打包。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow" data-en="Features">功能</p>
+        <h2 data-en="A PC keyboard, not a phone keyboard">是 PC 键盘，不是手机键盘</h2>
+        <p class="lead" data-en="Number row with shifted symbols, sticky modifiers, arrow keys, a Chinese/English toggle — the things you only notice by their absence once you start typing real sentences on a touchscreen.">
+          数字行带完整上档符号、粘滞修饰键、方向键、中英切换——这些只有在屏幕上真打起字来才会发现缺了不行。
+        </p>
+      </div>
+
+      <div class="features">
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-grid"/></svg></span><div><h3 data-en="Full PC layout">PC 风格全键盘</h3><p data-en="Number row, letters, arrows, Esc / Tab / Del / Enter. No flipping between symbol pages.">数字行（含上档符号）、字母、方向键、Esc / Tab / Del / Enter，不用在符号页之间来回翻。</p></div></article>
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-sticky"/></svg></span><div><h3 data-en="Sticky modifiers">粘滞修饰键</h3><p data-en="Ctrl / Alt / ⊞ / Shift / Caps apply to the next key only — no long-press on a touchscreen.">Ctrl / Alt / ⊞ / Shift / Caps 点一次只作用于下一个键，触摸屏上不用长按。</p></div></article>
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-globe"/></svg></span><div><h3 data-en="Chinese / English">中 / 英切换</h3><p data-en="The 中/英 key sends Super+Space through GNOME's input-source switch; candidates work as usual in ibus-libpinyin.">右下角 中/英 键直发 Super+Space，走 GNOME 输入源切换；ibus-libpinyin 的候选词照常操作。</p></div></article>
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-expand"/></svg></span><div><h3 data-en="Three sizes">三档尺寸</h3><p data-en="Small / medium / large at 55 %, 66 % and 76 % of the screen width, switched from the grip bar and remembered across logins.">小 / 中 / 大三档占屏宽 55 % / 66 % / 76 %，拖动条右侧一点即换，跨登录记忆。</p></div></article>
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-move"/></svg></span><div><h3 data-en="Drag and collapse">可拖动 · 可收起</h3><p data-en="Hold the grip bar to move it, ⌄ collapses it to a thin strip, ✕ closes it. The position survives a reboot.">按住拖动条定位，⌄ 收起成细条，✕ 关闭；位置与档位重启后还在。</p></div></article>
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-toggle"/></svg></span><div><h3 data-en="Two entry points, one state">两个入口，一个状态</h3><p data-en="The Quick Settings switch and the PAD-OSK app icon share one state file, so the two never disagree.">Quick Settings 的「屏幕键盘」开关与应用抽屉里的 PAD-OSK 图标共用同一个状态文件，不会各说各话。</p></div></article>
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-focus"/></svg></span><div><h3 data-en="Never steals focus">不抢焦点</h3><p data-en="The UI is a shell layer, so tapping a key does not move the caret out of the field you were typing in.">UI 是 shell 图层而不是窗口，点键盘不会把光标从输入框里赶走。</p></div></article>
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-window"/></svg></span><div><h3 data-en="Steps aside for dialogs">关机对话框自动让开</h3><p data-en="When the shutdown / restart / logout dialog appears the keyboard hides, and comes back when the dialog closes.">关机、重启、注销对话框出现时键盘自动隐藏，关闭后恢复，不会挡住按钮。</p></div></article>
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-save"/></svg></span><div><h3 data-en="Remembers your setup">配置持久化</h3><p data-en="Position, visibility and size step are written to ~/.config/erhai-osk/position.kf and survive uninstall.">位置、开关状态、尺寸档位写在 <code>~/.config/erhai-osk/position.kf</code>，卸载也会保留。</p></div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INSTALL ============ -->
+  <section class="section" id="install">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow" data-en="Install">安装</p>
+        <h2 data-en="One deb, one reboot">一个 deb，一次重启</h2>
+        <p class="lead" data-en="GNOME only scans the extension directory when the shell starts, so a reboot is part of the installation — not a troubleshooting step you might skip.">
+          GNOME 只在 shell 启动时扫描扩展目录，所以重启是安装的一部分，不是你遇到问题时才做的事。
+        </p>
+      </div>
+
+      <div class="install-grid">
+        <div class="steps reveal">
+          <div class="step">
+            <span class="n">1</span>
+            <div>
+              <h3 data-en="Get the package">拿到安装包</h3>
+              <p data-en="Download pad-osk_0.Demo_arm64.deb (13.7 KB) from the Gitee or GitHub release page. Both repositories carry the same content, and arm64 is the only build available.">从 Gitee 或 GitHub 的 Release 页面下载 <code>pad-osk_0.Demo_arm64.deb</code>（13.7 KB）。两个仓库内容对等；<strong>目前只有 arm64 构建</strong>。</p>
+              <div class="code">
+                <button class="copy" type="button" aria-label="Copy"><svg aria-hidden="true"><use href="#i-copy"/></svg></button>
+                <pre><code>gitee.com/HOSHINO6/ubuntu-pad-keyboard/releases
+github.com/HOSHINO61/ubuntu-pad-keyboard/releases</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <span class="n">2</span>
+            <div>
+              <h3 data-en="Install it">安装</h3>
+              <p data-en="apt pulls in the extension, the launcher icon and the toggle script. Conflicts/Replaces take care of the older opd2413-keyboard package.">apt 会装好扩展、应用图标和开关脚本；<code>Conflicts</code> / <code>Replaces</code> 会自动顶掉旧的 opd2413-keyboard 包。</p>
+              <div class="code">
+                <button class="copy" type="button" aria-label="Copy"><svg aria-hidden="true"><use href="#i-copy"/></svg></button>
+                <pre><code><span class="c"># 在安装包所在目录</span>
+sudo apt install ./pad-osk_0.Demo_arm64.deb</code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <span class="n">3</span>
+            <div>
+              <h3 data-en="Reboot (do not just log out)">重启（不要只注销）</h3>
+              <p data-en="The shell loads extensions at startup. On some tablets a plain logout can leave the gdm greeter black with a dead touchscreen, so reboot instead.">shell 启动时才加载扩展。部分机型只注销时，gdm 登录界面可能偶发黑屏且触屏失效，所以直接重启。</p>
+              <div class="code">
+                <button class="copy" type="button" aria-label="Copy"><svg aria-hidden="true"><use href="#i-copy"/></svg></button>
+                <pre><code>sudo reboot</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout warn">
+            <span class="ico"><svg aria-hidden="true"><use href="#i-warn"/></svg></span>
+            <span><strong data-en="Reboot, do not log out.">装完请重启，不要只注销。</strong><span data-en=" On some tablets the gdm login screen may come up black with a dead touchscreen; a full reboot avoids the whole class of problem."> 部分平板的 gdm 登录界面可能偶发黑屏 + 触屏失效，整机重启可以绕开这一类问题。</span></span>
+          </div>
+        </div>
+
+        <div class="reveal">
+          <div class="panel">
+            <h3 data-en="After the reboot">重启之后</h3>
+            <ul class="list">
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span data-en="Quick Settings (top right) → “Screen Keyboard” switch">右上角系统菜单 → <strong>屏幕键盘</strong> 开关</span></li>
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span data-en="Application grid → PAD-OSK icon">应用抽屉 → <strong>PAD-OSK</strong> 图标</span></li>
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span data-en="Grip bar: drag to move, ⌄ to collapse, 小/中/大 to resize">拖动条：<strong>⠿ 拖动</strong> 定位、<strong>⌄</strong> 收起、<strong>小/中/大</strong> 换档</span></li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <h3 data-en="Check it loaded">确认扩展已加载</h3>
+            <div class="code">
+              <button class="copy" type="button" aria-label="Copy"><svg aria-hidden="true"><use href="#i-copy"/></svg></button>
+              <pre><code>gnome-extensions info erhai-osk@local</code></pre>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3 data-en="Upgrading from 1.0.x">从 1.0.x 升级</h3>
+            <p style="font-size:13.3px;color:var(--muted)" data-en="The package was renamed from opd2413-keyboard to pad-osk in Demo. apt handles it; a bare dpkg -i needs the old one removed first. The extension UUID and config directory are unchanged, so your position and size step survive.">
+              Demo 起包名由 <code>opd2413-keyboard</code> 改为 <code>pad-osk</code>。<code>apt install</code> 会自动处理，裸 <code>dpkg -i</code> 需要先手动卸旧包。扩展 UUID 和配置目录都没变，位置与档位会保留。
+            </p>
+          </div>
+
+          <div class="panel">
+            <h3 data-en="Uninstall">卸载</h3>
+            <div class="code">
+              <button class="copy" type="button" aria-label="Copy"><svg aria-hidden="true"><use href="#i-copy"/></svg></button>
+              <pre><code>sudo apt remove pad-osk</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTED ============ -->
+  <section class="section" id="compat">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow" data-en="Tested on">实测范围</p>
+        <h2 data-en="Honest about what has been verified">哪些验证过，哪些没有</h2>
+        <p class="lead" data-en="It should run on any arm64 tablet with Ubuntu and GNOME 50 Wayland—but all of the following was verified on one machine: a OnePlus Pad 2 Pro running Ubuntu 26.04.1 LTS with GNOME Shell 50.1. Other tablets are a self-test.">
+          任何装了 arm64 版 Ubuntu、跑 GNOME 50 Wayland 的平板都应该能用——但下面这些只在一台机器上验证过：一加 Pad 2 Pro，Ubuntu 26.04.1 LTS，GNOME Shell 50.1，arm64。其它机型请自测。
+        </p>
+      </div>
+
+      <div class="grid grid-2" style="align-items:start;gap:18px">
+        <div class="card reveal" style="padding:22px">
+          <h3 style="margin-bottom:14px" data-en="Typing works in">可以正常输入</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <span class="chip"><b>QQ</b> · Electron</span>
+            <span class="chip"><b>Chrome</b></span>
+            <span class="chip"><b>Firefox</b></span>
+            <span class="chip"><b data-en="Terminal">终端</b></span>
+            <span class="chip" style="border-color:rgba(95,214,138,.35);color:var(--ok)" data-en="Chinese input included">含中文输入</span>
+          </div>
+          <p style="margin-top:16px;font-size:13.5px;color:var(--muted)" data-en="No more vanishing caret when you tap the keyboard, and no more X11 bell — that bell was the sound of a key arriving with no focused input field.">
+            不再出现「点键盘后光标消失」，也不再出现 X11 铃音——那个铃声正是「按键到了、但没有焦点输入框」的证据。
+          </p>
+        </div>
+
+        <div class="card reveal" style="padding:22px">
+          <h3 style="margin-bottom:14px" data-en="Known limits">已知限制</h3>
+          <ul class="list" style="display:grid;gap:10px;font-size:13.6px;color:var(--text-2);list-style:none;margin:0;padding:0">
+            <li style="display:flex;gap:9px"><svg style="width:15px;height:15px;flex:none;margin-top:4px;color:var(--accent-2)" aria-hidden="true"><use href="#i-warn"/></svg><span data-en="Only verified on the OnePlus Pad 2 Pro with GNOME 50 Wayland. Other tablets: self-test.">只在<strong>一加 Pad 2 Pro + GNOME 50 Wayland</strong>上验证过，其它平板自测。</span></li>
+            <li style="display:flex;gap:9px"><svg style="width:15px;height:15px;flex:none;margin-top:4px;color:var(--accent-2)" aria-hidden="true"><use href="#i-warn"/></svg><span data-en-html="metadata.json declares shell-version 50 only — GNOME 45–49 will not load it. <strong>There is only an arm64 package; amd64 is not built yet.</strong>"><code>metadata.json</code> 只声明 <code>shell-version: [&quot;50&quot;]</code>，GNOME 45–49 不会加载；<strong>只有 arm64 包，amd64 尚未构建</strong>。</span></li>
+            <li style="display:flex;gap:9px"><svg style="width:15px;height:15px;flex:none;margin-top:4px;color:var(--accent-2)" aria-hidden="true"><use href="#i-warn"/></svg><span data-en="The three sizes are absolute pixels calibrated for 1696 px, so a different logical resolution drifts the ratio (adaptive scaling is on the todo list).">三档是<strong>绝对像素</strong>，按 1696 px 逻辑屏宽标定；换不同逻辑分辨率的平板比例会漂（自适应缩放待办中）。</span></li>
+            <li style="display:flex;gap:9px"><svg style="width:15px;height:15px;flex:none;margin-top:4px;color:var(--accent-2)" aria-hidden="true"><use href="#i-warn"/></svg><span data-en="Chinese input needs ibus + ibus-libpinyin (already in Recommends), and there is no key repeat on long press.">打中文需要 <code>ibus</code> + <code>ibus-libpinyin</code>（已在 <code>Recommends</code> 里声明）；另外没有长按重复。</span></li>
+          </ul>
+          <a class="link-more" href="tech.html#limits">
+            <span data-en="Compatibility details">兼容性细节</span>
+            <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DOWNLOAD ============ -->
+  <section class="section" id="download">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow" data-en="Download">下载</p>
+        <h2 data-en="Download vDemo">下载 vDemo</h2>
+        <p class="lead" data-en="The package is pad-osk_0.Demo_arm64.deb, 13.7 KB. Two mirrors with identical trees but different commit SHAs — each side replays the commits under its own account identity. Mainland China: Gitee. Elsewhere: GitHub.">
+          安装包 <code>pad-osk_0.Demo_arm64.deb</code>，13.7 KB。两个镜像的 tree 完全一致、提交 SHA 不同——两边用各自的账号身份重放提交。中国大陆走 Gitee，海外走 GitHub。
+        </p>
+      </div>
+
+      <div class="dl-grid">
+        <div class="dl-card reveal">
+          <div class="dl-top">
+            <svg aria-hidden="true" style="color:#ff7a4d"><use href="#i-dl"/></svg>
+            <h3>Gitee</h3>
+            <span class="badge-soon" data-en="Recommended in China">国内推荐</span>
+          </div>
+          <p data-en="Fastest from mainland China. Release attachments, source and issues all live here.">国内访问更快更稳，Release 附件、源码与 issue 都在这里。</p>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--muted);word-break:break-all">gitee.com/HOSHINO6/ubuntu-pad-keyboard</p>
+          <a class="btn btn-primary" href="https://gitee.com/HOSHINO6/ubuntu-pad-keyboard/releases" target="_blank" rel="noopener">
+            <svg aria-hidden="true"><use href="#i-dl"/></svg>
+            <span data-en="Download on Gitee">前往 Gitee 下载</span>
+          </a>
+        </div>
+        <div class="dl-card reveal">
+          <div class="dl-top">
+            <svg aria-hidden="true" style="color:#e6edf3"><use href="#i-dl"/></svg>
+            <h3>GitHub</h3>
+            <span class="badge-soon" data-en="Mirror">镜像</span>
+          </div>
+          <p data-en="For everyone outside mainland China. Same tree, replayed commits, own CI identity.">海外访问首选。同样的 tree，提交以另一套身份重放。</p>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--muted);word-break:break-all">github.com/HOSHINO61/ubuntu-pad-keyboard</p>
+          <a class="btn btn-ghost" href="https://github.com/HOSHINO61/ubuntu-pad-keyboard/releases" target="_blank" rel="noopener">
+            <svg aria-hidden="true"><use href="#i-dl"/></svg>
+            <span data-en="Download on GitHub">前往 GitHub 下载</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:18px">
+        <span class="ico"><svg aria-hidden="true"><use href="#i-warn"/></svg></span>
+        <span data-en="Built for arm64 Ubuntu on GNOME 50 Wayland. Installing Ubuntu on the tablet itself is a separate, per-device upstream project — this repository only covers the touch-input half.">
+          面向 <strong>arm64 版 Ubuntu + GNOME 50 Wayland</strong>。把 Ubuntu 装进平板是各机型自己的上游项目，本仓库只负责<strong>触屏输入</strong>这一块。
+        </span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <a class="brand" href="index.html">
+          <img src="favicon.svg" alt="" width="26" height="26">
+          <span>PAD-OSK</span>
+        </a>
+        <p data-en="A GNOME Shell on-screen keyboard for arm64 Ubuntu. Keys injected inside the compositor; focus never stolen; Chinese input included.">
+          给 arm64 版 Ubuntu 的 GNOME 屏幕键盘。合成器内注入按键，不抢焦点，支持中文输入。
+        </p>
+      </div>
+      <div>
+        <h4 data-en="Project">项目</h4>
+        <ul>
+          <li><a href="tech.html" data-en="Technical notes">技术方案</a></li>
+          <li><a href="#install" data-en="Installation">安装说明</a></li>
+          <li><a href="#sizes" data-en="Size steps">尺寸三档</a></li>
+          <li><a href="#compat" data-en="Known limits">已知限制</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-en="Elsewhere">外部链接</h4>
+        <ul>
+          <li><a href="https://gitee.com/HOSHINO6/ubuntu-pad-keyboard" target="_blank" rel="noopener">项目 Gitee</a></li>
+          <li><a href="https://github.com/HOSHINO61/ubuntu-pad-keyboard" target="_blank" rel="noopener">项目 GitHub</a></li>
+          <li><a href="https://github.com/yzddmr6/onepluspad-2pro-mainline/blob/main/README.zh-CN.md" target="_blank" rel="noopener" title="Ubuntu for OnePlus Pad 2 Pro" data-en="Upstream · Pad 2 Pro">上游项目 · 一加 Pad 2 Pro</a></li>
+          <li><a href="https://github.com/HOSHINO61/ubuntu-pad-keyboard/blob/master/LICENSE" target="_blank" rel="noopener">MIT License</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Copyright © 2026 · <a href="https://mybailu.cn/" target="_blank" rel="noopener noreferrer" title="访问作者网站">小鸟游星野</a></span>
+      <span data-en="Mutter 18 · Clutter 18 · GJS — built on the shell's own APIs">Mutter 18 · Clutter 18 · GJS — 只用 shell 自己的 API</span>
+    </div>
+    <div class="footer-legal">
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">鲁ICP备2023031929号</a>
+      <a href="https://beian.mps.gov.cn/#/query/webSearch?code=37020002000445" target="_blank" rel="noopener noreferrer"><img src="assets/img/beian.png" alt="" width="14" height="14"> 鲁公网安备37020002000445号</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

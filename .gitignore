@@ -1,10 +1,10 @@
-# osk-keyboard
+# pad-osk
 #
 # 本仓库只收录屏幕键盘项目。若把本目录嵌在更大的工作区里使用，
 # 下面这些规则可以防止误提交无关内容。
 
 # 构建中间产物（build-deb.sh 生成，DEBIAN/postinst 里的版本号会被替换）
-/packaging/osk-keyboard/usr/
+/packaging/pad-osk/usr/
 
 # dist/ 只放 .deb
 /dist/*

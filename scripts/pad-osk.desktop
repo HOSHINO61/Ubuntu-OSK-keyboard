@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=OSK-Keyboard
-Name[zh_CN]=OSK-Keyboard
+Name=PAD-OSK
+Name[zh_CN]=PAD-OSK
 Comment=Toggle the on-screen keyboard on/off
 Comment[zh_CN]=开/关屏幕键盘
-Exec=osk-keyboard
+Exec=pad-osk
 Icon=input-keyboard
 Terminal=false
 Categories=Utility;Accessibility;

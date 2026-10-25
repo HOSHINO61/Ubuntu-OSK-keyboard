@@ -20,7 +20,7 @@ if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
         rm -rf "$ASIDE"
         mv "$RU_HOME/.local/share/gnome-shell/extensions/$UUID" "$ASIDE"
         chown -R "$SUDO_USER:" "$ASIDE" 2>/dev/null || true
-        echo "osk-keyboard: moved the hand-installed copy to"
+        echo "pad-osk: moved the hand-installed copy to"
         echo "  $ASIDE"
     fi
 
@@ -28,8 +28,9 @@ if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
     if [ -n "$RU_HOME" ]; then
         rm -f "$RU_HOME/.local/share/applications/opd2413-keyboard.desktop"
         rm -f "$RU_HOME/.local/share/applications/osk-keyboard.desktop"
+    rm -f "$RU_HOME/.local/share/applications/pad-osk.desktop"
     fi
-    rm -f /usr/local/bin/opd2413-keyboard /usr/local/bin/osk-keyboard
+    rm -f /usr/local/bin/opd2413-keyboard /usr/local/bin/osk-keyboard /usr/local/bin/pad-osk
 fi
 
 if command -v update-desktop-database >/dev/null 2>&1; then
@@ -44,14 +45,14 @@ if [ -n "${RU_UID:-}" ] && [ -d "/run/user/$RU_UID" ]; then
 fi
 
 cat <<EOF
-osk-keyboard $PKG_VERSION installed.
+pad-osk $PKG_VERSION installed.
 
 This keyboard is a GNOME Shell extension, so it loads when the shell starts.
 Reboot once (do not merely log out -- some devices lose the gdm
 display and touch input), then toggle it from:
 
   * Quick Settings   ->  "Screen Keyboard" switch
-  * Application grid ->  "OSK-Keyboard" icon
+  * Application grid ->  "PAD-OSK" icon
 
 Verify:  gnome-extensions info $UUID
 EOF
