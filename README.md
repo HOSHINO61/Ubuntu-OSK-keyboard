@@ -163,7 +163,8 @@ scale_large=1.00
 sudo apt install ./dist/opd2413-keyboard_1.0.1_arm64.deb
 ```
 
-装完**注销重新登录一次**（GNOME 只在 shell 启动时扫描扩展目录）。
+装完建议**重启**（不建议只注销：部分设备的 gdm 登录界面偶发黑屏 + 触屏失效）。
+GNOME 只在 shell 启动时扫描扩展目录，所以必须重启一次会话。
 
 之后两种方式开关键盘：
 
