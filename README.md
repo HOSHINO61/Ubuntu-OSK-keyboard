@@ -8,7 +8,7 @@ PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用
 
 > **中国大陆用户建议访问 [Gitee 镜像](https://gitee.com/HOSHINO6/Ubuntu-OSK-keyboard)**，
 > 下载更快、连接更稳定；
-> **海外用户建议使用 [GitHub](https://github.com/HOSHINO61/Ubuntu-OSD-keyboard)**。
+> **海外用户建议使用 [GitHub](https://github.com/HOSHINO61/Ubuntu-OSK-keyboard)**。
 > 两个仓库内容对等，均可使用。
 
 ---
