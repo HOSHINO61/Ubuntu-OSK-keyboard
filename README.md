@@ -145,13 +145,19 @@ scale_large=1.00
 
 ## 截图
 
-Quick Settings 里能看到「屏幕键盘」开关，键盘处于「小」档（WiFi 名称已打码）：
+「中」档（默认）——Quick Settings 里能看到「屏幕键盘」开关，WiFi 名称已打码：
 
-![Quick Settings 里的屏幕键盘开关](docs/images/keyboard-quick-settings.png)
+![Quick Settings 里的屏幕键盘开关（中档）](docs/images/keyboard-quick-settings.png)
 
-三档尺寸按钮在拖动条右侧，当前档填充高亮：
+「小」档：
 
-![三档尺寸](docs/images/keyboard-sizes.png)
+![Quick Settings 里的屏幕键盘开关（小档）](docs/images/keyboard-quick-settings-small.png)
+
+三档按钮在拖动条右侧，当前档填充高亮：
+
+| 小（55%） | 中（66%） |
+|---|---|
+| ![小](docs/images/keyboard-sizes-small.png) | ![中](docs/images/keyboard-sizes.png) |
 
 ## 安装
 
