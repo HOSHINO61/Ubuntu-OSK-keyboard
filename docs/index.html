@@ -310,7 +310,7 @@ github.com/HOSHINO61/ubuntu-pad-keyboard/releases</code></pre>
             <span class="n">2</span>
             <div>
               <h3 data-en="Install it">安装</h3>
-              <p data-en="apt pulls in the extension, the launcher icon and the toggle script. Conflicts/Replaces take care of the older opd2413-keyboard package.">apt 会装好扩展、应用图标和开关脚本；<code>Conflicts</code> / <code>Replaces</code> 会自动顶掉旧的 opd2413-keyboard 包。</p>
+              <p data-en="apt pulls in the extension, the launcher icon and the toggle script.">apt 会装好扩展、应用图标和开关脚本。</p>
               <div class="code">
                 <button class="copy" type="button" aria-label="Copy"><svg aria-hidden="true"><use href="#i-copy"/></svg></button>
                 <pre><code><span class="c"># 在安装包所在目录</span>
@@ -351,21 +351,6 @@ sudo apt install ./pad-osk_0.Demo_arm64.deb</code></pre>
             <div class="code">
               <button class="copy" type="button" aria-label="Copy"><svg aria-hidden="true"><use href="#i-copy"/></svg></button>
               <pre><code>gnome-extensions info erhai-osk@local</code></pre>
-            </div>
-          </div>
-
-          <div class="panel">
-            <h3 data-en="Upgrading from 1.0.x">从 1.0.x 升级</h3>
-            <p style="font-size:13.3px;color:var(--muted)" data-en="The package was renamed from opd2413-keyboard to pad-osk in Demo. apt handles it; a bare dpkg -i needs the old one removed first. The extension UUID and config directory are unchanged, so your position and size step survive.">
-              Demo 起包名由 <code>opd2413-keyboard</code> 改为 <code>pad-osk</code>。<code>apt install</code> 会自动处理，裸 <code>dpkg -i</code> 需要先手动卸旧包。扩展 UUID 和配置目录都没变，位置与档位会保留。
-            </p>
-          </div>
-
-          <div class="panel">
-            <h3 data-en="Uninstall">卸载</h3>
-            <div class="code">
-              <button class="copy" type="button" aria-label="Copy"><svg aria-hidden="true"><use href="#i-copy"/></svg></button>
-              <pre><code>sudo apt remove pad-osk</code></pre>
             </div>
           </div>
         </div>

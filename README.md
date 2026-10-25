@@ -179,17 +179,6 @@ sudo apt remove pad-osk
 
 用户配置 `~/.config/erhai-osk/`（位置、开关状态）会保留。
 
-> **从旧包升级**：v1.0.x 的包名是 `opd2413-keyboard`，从 Demo 起改为
-> `pad-osk`。control 里带了 `Conflicts`/`Replaces`，正常 `apt install` 会自动
-> 卸掉旧包；如果用的是裸 `dpkg -i`，先手动卸一次：
->
-> ```bash
-> sudo apt remove opd2413-keyboard
-> sudo apt install ./dist/pad-osk_0.Demo_arm64.deb
-> ```
->
-> 扩展 UUID（`erhai-osk@local`）和配置目录（`~/.config/erhai-osk/`）都没变，
-> 位置、开关状态、尺寸档位会保留。
 
 ### 从源码构建
 

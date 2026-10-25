@@ -4,9 +4,6 @@
 # Run from the project root on a Debian/Ubuntu host (needs dpkg-deb).
 # Produces dist/pad-osk_<ver>_<arch>.deb from the files already in this
 # repo, so the package can never drift from the source tree.
-#
-# Before Demo the package was called opd2413-keyboard; the new name carries
-# Conflicts/Replaces so a plain `apt install` migrates cleanly.
 set -e
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)

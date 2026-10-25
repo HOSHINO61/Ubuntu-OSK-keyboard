@@ -1,4 +1,4 @@
-/* OSK-Keyboard site — language switch, size demo, copy buttons, reveal */
+/* PAD-OSK site — language switch, size demo, copy buttons, reveal */
 (function () {
   'use strict';
 

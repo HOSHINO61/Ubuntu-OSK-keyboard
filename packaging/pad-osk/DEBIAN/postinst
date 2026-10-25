@@ -26,11 +26,9 @@ if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
 
     # A hand-installed desktop entry and launcher shadow the packaged ones.
     if [ -n "$RU_HOME" ]; then
-        rm -f "$RU_HOME/.local/share/applications/opd2413-keyboard.desktop"
-        rm -f "$RU_HOME/.local/share/applications/osk-keyboard.desktop"
     rm -f "$RU_HOME/.local/share/applications/pad-osk.desktop"
     fi
-    rm -f /usr/local/bin/opd2413-keyboard /usr/local/bin/osk-keyboard /usr/local/bin/pad-osk
+    rm -f /usr/local/bin/pad-osk
 fi
 
 if command -v update-desktop-database >/dev/null 2>&1; then
