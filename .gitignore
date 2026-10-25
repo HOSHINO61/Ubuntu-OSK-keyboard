@@ -18,3 +18,8 @@ desktop.ini
 .idea/
 *.swp
 *~
+
+# 临时脚本与截图工作目录（不要把调试用的中间产物提交进来）
+/_*.py
+/_shots/
+/*.corrupt.bak
