@@ -143,6 +143,16 @@ scale_large=1.00
 
 ---
 
+## 截图
+
+Quick Settings 里能看到「屏幕键盘」开关，键盘处于「小」档（WiFi 名称已打码）：
+
+![Quick Settings 里的屏幕键盘开关](docs/images/keyboard-1.1-quick-settings.png)
+
+三档尺寸按钮在拖动条右侧，当前档填充高亮：
+
+![三档尺寸](docs/images/keyboard-1.1-sizes.png)
+
 ## 安装
 
 ```bash
