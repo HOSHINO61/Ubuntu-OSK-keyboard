@@ -66,18 +66,22 @@ const COLORS = {
     on: 'background-color: #ffd479; color: #1e2022;',
 };
 
-// Three sizes, picked from the grip bar.  ~20% either side of the medium size
-// keeps the small one usable on a 3392px-wide screen and the large one still
-// on-screen.
+// Three sizes, picked from the grip bar.  The medium step is the reference
+// (1.00); small is the size a normal desktop OSK has, large is ~12% bigger so
+// it stays readable without eating the whole screen.  A file in
+// ~/.config/erhai-osk/position.kf ([layout] scale_small= / scale_large=) can
+// override the two factors, so tuning needs neither a rebuild nor a re-login.
 const SIZE_STEPS = [
-    {name: 'small', label: '小', scale: 0.80},
+    {name: 'small', label: '小', scale: 0.65},
     {name: 'medium', label: '中', scale: 1.00},
-    {name: 'large', label: '大', scale: 1.28},
+    {name: 'large', label: '大', scale: 1.12},
 ];
 const DEFAULT_SIZE = 'medium';
+const SCALE_MIN = 0.40;
+const SCALE_MAX = 2.00;
 
-function sizeStep(name) {
-    return SIZE_STEPS.find(s => s.name === name) ?? SIZE_STEPS[1];
+function findStep(steps, name) {
+    return steps.find(s => s.name === name) ?? steps[1];
 }
 
 // Whole pixels only: fractional sizes give blurry glyphs in St.
@@ -246,9 +250,10 @@ export default class ErhaiOSK extends Extension {
             // Restore the size before the rows are built, so the very first
             // allocation is already the right size (no visible jump).
             const cfg = this._loadConfig();
-            this._sizeName = cfg && SIZE_STEPS.some(s => s.name === cfg.size)
+            this._steps = this._readScales(cfg);
+            this._sizeName = cfg && this._steps.some(s => s.name === cfg.size)
                 ? cfg.size : DEFAULT_SIZE;
-            this._scale = sizeStep(this._sizeName).scale;
+            this._scale = findStep(this._steps, this._sizeName).scale;
             this._savedConfig = cfg;
 
             this._hidden = false;
@@ -419,7 +424,7 @@ export default class ErhaiOSK extends Extension {
         this._grip.add_child(this._dragArea);
 
         // 小 / 中 / 大 -- a segmented control, the active step filled.
-        for (const step of SIZE_STEPS) {
+        for (const step of this._steps) {
             const btn = new St.Button({
                 child: new St.Label({
                     text: step.label,
@@ -462,12 +467,20 @@ export default class ErhaiOSK extends Extension {
     // Restyle in place -- the rows are never rebuilt, so a touch that is down
     // while the size changes still lands on the button it started on.
     _setSize(name) {
-        if (!SIZE_STEPS.some(s => s.name === name) || name === this._sizeName)
+        // Re-read the overrides on every click, so editing the KeyFile is
+        // enough to retune the factors -- no rebuild, no re-login.
+        this._steps = this._readScales();
+        if (!this._steps.some(s => s.name === name))
+            return;
+        const step = findStep(this._steps, name);
+        // Same step *and* same factor: nothing to do.  A retuned factor for
+        // the step already in use still gets applied, on the next click.
+        if (name === this._sizeName && step.scale === this._scale)
             return;
 
         const [, oldHeight] = this._box ? this._box.get_size() : [0, 0];
         this._sizeName = name;
-        this._scale = sizeStep(name).scale;
+        this._scale = step.scale;
         this._applyScale();
         this._saveConfig();
         log(`erhai-osk: size -> ${name} (scale ${this._scale})`);
@@ -475,6 +488,19 @@ export default class ErhaiOSK extends Extension {
         // Keep the bottom edge where it is: the panel grows upward instead of
         // pushing itself off the bottom of the screen.
         this._reflow(oldHeight);
+    }
+
+    // SIZE_STEPS defaults with the file's [layout] scale_small= / scale_large=
+    // layered on top, clamped to something that cannot destroy the layout.
+    _readScales(cfg = null) {
+        const conf = cfg ?? this._loadConfig();
+        const steps = SIZE_STEPS.map(s => ({...s}));
+        for (const step of steps) {
+            const raw = conf ? conf[`scale_${step.name}`] : null;
+            if (typeof raw === 'number' && raw >= SCALE_MIN && raw <= SCALE_MAX)
+                step.scale = Math.round(raw * 100) / 100;
+        }
+        return steps;
     }
 
     // Re-place the panel after its height changed, keeping the bottom edge put.
@@ -515,7 +541,7 @@ export default class ErhaiOSK extends Extension {
     }
 
     _updateSizeButtons() {
-        for (const step of SIZE_STEPS) {
+        for (const step of this._steps) {
             const btn = this._sizeBtns[step.name];
             if (btn)
                 btn.style = sizeBtnStyle(step.name === this._sizeName, this._scale);
@@ -924,8 +950,9 @@ export default class ErhaiOSK extends Extension {
         return GLib.build_filenamev([GLib.get_user_config_dir(), POS_FILE]);
     }
 
-    // Returns {x, y, size} -- `size` is null for files written before the size
-    // selector existed, which the caller turns into DEFAULT_SIZE.
+    // Returns {x, y, size, scale_small, scale_large}.  Anything the file does
+    // not carry is null: `size` falls back to DEFAULT_SIZE, the two scale
+    // factors fall back to SIZE_STEPS.
     _loadConfig() {
         try {
             const path = this._posPath();
@@ -933,15 +960,35 @@ export default class ErhaiOSK extends Extension {
                 return null;
             const kf = new GLib.KeyFile();
             kf.load_from_file(path, GLib.KeyFileFlags.NONE);
-            let size = null;
+
+            let hasLayout = false;
             try {
-                if (kf.get_groups().includes('layout'))
-                    size = kf.get_string('layout', 'size');
-            } catch (e) { /* group missing in older files */ }
+                hasLayout = kf.get_groups().includes('layout');
+            } catch (e) { /* older files have no groups listing */ }
+
+            const str = key => {
+                if (!hasLayout)
+                    return null;
+                try {
+                    return kf.get_string('layout', key);
+                } catch (e) {
+                    return null;
+                }
+            };
+            const num = key => {
+                const raw = str(key);
+                if (raw === null)
+                    return null;
+                const value = parseFloat(raw);
+                return Number.isFinite(value) ? value : null;
+            };
+
             return {
                 x: kf.get_integer('position', 'x'),
                 y: kf.get_integer('position', 'y'),
-                size,
+                size: str('size'),
+                scale_small: num('scale_small'),
+                scale_large: num('scale_large'),
             };
         } catch (e) {
             log(`erhai-osk: load config failed: ${e}`);
@@ -955,15 +1002,25 @@ export default class ErhaiOSK extends Extension {
         try {
             const path = this._posPath();
             GLib.mkdir_with_parents(GLib.path_get_dirname(path), 0o755);
+            // Hand-tuned scale factors live in this same file; rewriting it
+            // without reading them first would erase the user's tuning.
+            const prev = this._loadConfig();
             const kf = new GLib.KeyFile();
             kf.set_integer('position', 'x', Math.round(this._posX));
             kf.set_integer('position', 'y', Math.round(this._posY));
             kf.set_string('layout', 'size', this._sizeName || DEFAULT_SIZE);
+            for (const key of ['scale_small', 'scale_large']) {
+                const value = prev ? prev[key] : null;
+                if (typeof value === 'number')
+                    kf.set_string('layout', key, String(value));
+            }
             kf.save_to_file(path);
             this._savedConfig = {
                 x: Math.round(this._posX),
                 y: Math.round(this._posY),
                 size: this._sizeName || DEFAULT_SIZE,
+                scale_small: prev ? prev.scale_small : null,
+                scale_large: prev ? prev.scale_large : null,
             };
         } catch (e) {
             log(`erhai-osk: save config failed: ${e}`);
