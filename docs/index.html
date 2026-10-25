@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PAD-OSK — arm64 版 Ubuntu 的屏幕键盘（GNOME 50 Wayland）</title>
-<meta name="description" content="PAD-OSK 是给 arm64 版 Ubuntu（GNOME 50 Wayland）用的屏幕键盘：按键在合成器内部通过 Clutter.VirtualInputDevice 注入，Electron / Chromium 应用照常收字；UI 是 shell 图层，永不抢焦点。支持中文输入与三档尺寸，任何 arm64 平板都能装。">
+<title>Pad-OSK — arm64 版 Ubuntu 的屏幕键盘（GNOME 50 Wayland）</title>
+<meta name="description" content="Pad-OSK 是给 arm64 版 Ubuntu（GNOME 50 Wayland）用的屏幕键盘：按键在合成器内部通过 Clutter.VirtualInputDevice 注入，Electron / Chromium 应用照常收字；UI 是 shell 图层，永不抢焦点。支持中文输入与三档尺寸，任何 arm64 平板都能装。">
 <meta name="theme-color" content="#0b0d10">
 <meta property="og:type" content="website">
-<meta property="og:title" content="PAD-OSK — 装进 Ubuntu 里的屏幕键盘">
+<meta property="og:title" content="Pad-OSK — 装进 Pad 上的 Ubuntu 屏幕键盘">
 <meta property="og:description" content="arm64 版 Ubuntu · GNOME 50 Wayland。合成器内注入按键、不抢焦点、支持中文输入，三档尺寸。">
 <meta property="og:url" content="https://mybailu.cn/osk/">
-<meta property="og:site_name" content="PAD-OSK">
+<meta property="og:site_name" content="Pad-OSK">
 <meta property="og:image" content="https://mybailu.cn/osk/assets/img/og-cover.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -21,8 +21,8 @@
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/css/site.css">
 </head>
-<body data-title-zh="PAD-OSK — arm64 版 Ubuntu 的屏幕键盘（GNOME 50 Wayland）"
-      data-title-en="PAD-OSK — an on-screen keyboard for arm64 Ubuntu (GNOME 50 Wayland)">
+<body data-title-zh="Pad-OSK — arm64 版 Ubuntu 的屏幕键盘（GNOME 50 Wayland）"
+      data-title-en="Pad-OSK — an on-screen keyboard for arm64 Ubuntu (GNOME 50 Wayland)">
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
@@ -48,7 +48,7 @@
   <div class="wrap nav">
     <a class="brand" href="index.html">
       <img src="favicon.svg" alt="" width="26" height="26">
-      <span>PAD-OSK</span>
+      <span>Pad-OSK</span>
       <span class="brand-sub">arm64 Ubuntu</span>
     </a>
     <nav class="nav-links" aria-label="主导航">
@@ -76,13 +76,13 @@
     <div class="hero-grid">
       <div class="hero-copy">
         <span class="kicker"><i class="dot"></i><span data-en="arm64 tablets · GNOME 50 Wayland">arm64 平板通用 · GNOME 50 Wayland</span></span>
-        <h1 data-typewriter data-en-html="An on-screen keyboard <span class=&quot;hl&quot;>built into Ubuntu</span>">装进 Ubuntu 里的<br><span class="hl">屏幕键盘</span></h1>
-        <p class="lead" data-en="Put arm64 Ubuntu on a tablet and the touchscreen is only half useful: GNOME's own keyboard never appears in QQ or Chrome, and third-party keyboards cannot deliver a single character. PAD-OSK puts the keyboard inside GNOME Shell — keys are injected by the compositor, applications receive real keyboard events, and the keyboard itself never steals focus from the field you are typing in.">
-          arm64 版 Ubuntu 装在平板上，触屏只用得上一半：GNOME 自带的键盘在 QQ、Chrome 里弹不出来，第三方键盘又打不进字。PAD-OSK 把键盘做进 GNOME Shell —— 按键由合成器注入，应用收到的是真实键盘事件，而键盘本身永远不会抢走输入框的焦点。
+        <h1 data-typewriter data-en-html="An on-screen keyboard <span class=&quot;hl&quot;>for Ubuntu on your pad</span>">装进 Pad 上的<br><span class="hl">Ubuntu 屏幕键盘</span></h1>
+        <p class="lead" data-en="Put arm64 Ubuntu on a tablet and the touchscreen is only half useful: GNOME's own keyboard never appears in QQ or Chrome, and third-party keyboards cannot deliver a single character. Pad-OSK puts the keyboard inside GNOME Shell — keys are injected by the compositor, applications receive real keyboard events, and the keyboard itself never steals focus from the field you are typing in.">
+          arm64 版 Ubuntu 装在平板上，触屏只用得上一半：GNOME 自带的键盘在 QQ、Chrome 里弹不出来，第三方键盘又打不进字。Pad-OSK 把键盘做进 GNOME Shell —— 按键由合成器注入，应用收到的是真实键盘事件，而键盘本身永远不会抢走输入框的焦点。
         </p>
         <p class="hero-note">
           <svg aria-hidden="true"><use href="#i-warn"/></svg>
-          <span data-en-html="Requires <b>GNOME 50 + Wayland</b> on an <b>arm64</b> machine. The .deb is arm64 only — <b>there is no amd64 build yet</b>.">需要 <b>GNOME 50 + Wayland</b>，且机器是 <b>arm64</b>；目前只提供 arm64 的 .deb，<b>amd64 还没有构建</b>。</span>
+          <span data-en-html="Requires <b>GNOME 50 + Wayland</b> on an <b>arm64</b> machine. The .deb is arm64 only — <b>a DEMO is coming soon</b>; amd64 is not built yet.">需要 <b>GNOME 50 + Wayland</b>，且机器是 <b>arm64</b>；目前只提供 arm64 的 .deb，<b>DEMO 即将发布</b>，amd64 待构建。</span>
         </p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="#download">
@@ -98,7 +98,7 @@
           <span class="chip"><b>GNOME Shell 50</b></span>
           <span class="chip"><b>arm64</b> · Wayland</span>
           <span class="chip">MIT License</span>
-          <span class="chip"><b>vDemo</b></span>
+          <span class="chip">Demo</span>
           <span class="chip"><b>13.7</b> KB</span>
         </div>
       </div>
@@ -273,7 +273,7 @@ vdev.notify_keyval(t, keysym, Clutter.KeyState.RELEASED);</code></pre>
         <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-globe"/></svg></span><div><h3 data-en="Chinese / English">中 / 英切换</h3><p data-en="The 中/英 key sends Super+Space through GNOME's input-source switch; candidates work as usual in ibus-libpinyin.">右下角 中/英 键直发 Super+Space，走 GNOME 输入源切换；ibus-libpinyin 的候选词照常操作。</p></div></article>
         <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-expand"/></svg></span><div><h3 data-en="Three sizes">三档尺寸</h3><p data-en="Small / medium / large at 55 %, 66 % and 76 % of the screen width, switched from the grip bar and remembered across logins.">小 / 中 / 大三档占屏宽 55 % / 66 % / 76 %，拖动条右侧一点即换，跨登录记忆。</p></div></article>
         <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-move"/></svg></span><div><h3 data-en="Drag and collapse">可拖动 · 可收起</h3><p data-en="Hold the grip bar to move it, ⌄ collapses it to a thin strip, ✕ closes it. The position survives a reboot.">按住拖动条定位，⌄ 收起成细条，✕ 关闭；位置与档位重启后还在。</p></div></article>
-        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-toggle"/></svg></span><div><h3 data-en="Two entry points, one state">两个入口，一个状态</h3><p data-en="The Quick Settings switch and the PAD-OSK app icon share one state file, so the two never disagree.">Quick Settings 的「屏幕键盘」开关与应用抽屉里的 PAD-OSK 图标共用同一个状态文件，不会各说各话。</p></div></article>
+        <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-toggle"/></svg></span><div><h3 data-en="Two entry points, one state">两个入口，一个状态</h3><p data-en="The Quick Settings switch and the Pad-OSK app icon share one state file, so the two never disagree.">Quick Settings 的「屏幕键盘」开关与应用抽屉里的 Pad-OSK 图标共用同一个状态文件，不会各说各话。</p></div></article>
         <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-focus"/></svg></span><div><h3 data-en="Never steals focus">不抢焦点</h3><p data-en="The UI is a shell layer, so tapping a key does not move the caret out of the field you were typing in.">UI 是 shell 图层而不是窗口，点键盘不会把光标从输入框里赶走。</p></div></article>
         <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-window"/></svg></span><div><h3 data-en="Steps aside for dialogs">关机对话框自动让开</h3><p data-en="When the shutdown / restart / logout dialog appears the keyboard hides, and comes back when the dialog closes.">关机、重启、注销对话框出现时键盘自动隐藏，关闭后恢复，不会挡住按钮。</p></div></article>
         <article class="feature reveal"><span class="fi"><svg aria-hidden="true"><use href="#i-save"/></svg></span><div><h3 data-en="Remembers your setup">配置持久化</h3><p data-en="Position, visibility and size step are written to ~/.config/erhai-osk/position.kf and survive uninstall.">位置、开关状态、尺寸档位写在 <code>~/.config/erhai-osk/position.kf</code>，卸载也会保留。</p></div></article>
@@ -341,7 +341,7 @@ sudo apt install ./pad-osk_0.Demo_arm64.deb</code></pre>
             <h3 data-en="After the reboot">重启之后</h3>
             <ul class="list">
               <li><svg aria-hidden="true"><use href="#i-check"/></svg><span data-en="Quick Settings (top right) → “Screen Keyboard” switch">右上角系统菜单 → <strong>屏幕键盘</strong> 开关</span></li>
-              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span data-en="Application grid → PAD-OSK icon">应用抽屉 → <strong>PAD-OSK</strong> 图标</span></li>
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span data-en="Application grid → Pad-OSK icon">应用抽屉 → <strong>Pad-OSK</strong> 图标</span></li>
               <li><svg aria-hidden="true"><use href="#i-check"/></svg><span data-en="Grip bar: drag to move, ⌄ to collapse, 小/中/大 to resize">拖动条：<strong>⠿ 拖动</strong> 定位、<strong>⌄</strong> 收起、<strong>小/中/大</strong> 换档</span></li>
             </ul>
           </div>
@@ -458,7 +458,7 @@ sudo apt install ./pad-osk_0.Demo_arm64.deb</code></pre>
       <div class="footer-about">
         <a class="brand" href="index.html">
           <img src="favicon.svg" alt="" width="26" height="26">
-          <span>PAD-OSK</span>
+          <span>Pad-OSK</span>
         </a>
         <p data-en="A GNOME Shell on-screen keyboard for arm64 Ubuntu. Keys injected inside the compositor; focus never stolen; Chinese input included.">
           给 arm64 版 Ubuntu 的 GNOME 屏幕键盘。合成器内注入按键，不抢焦点，支持中文输入。

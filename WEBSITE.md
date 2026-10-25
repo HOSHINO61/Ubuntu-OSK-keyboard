@@ -1,6 +1,6 @@
 # 项目网站
 
-`docs/` 目录现在同时是 **文档目录** 和 **静态站点根目录**，可以直接被 GitHub Pages / Gitee Pages 发布。
+`docs/` 目录是纯静态站点，可直接拷到任意 Web 服务器发布（不依赖 GitHub/Gitee Pages，也不需要 CI）。
 
 - 首页：`docs/index.html` —— 定位、三档尺寸交互对比、特性、安装、下载
 - 技术页：`docs/tech.html` —— 十一条死路、工作原理图、中文输入三条通道、踩坑、兼容性
@@ -20,35 +20,6 @@
 python3 -m http.server 8080 -d docs
 # 打开 http://localhost:8080/
 ```
-
-## GitHub Pages
-
-**方式 A：仓库设置（最省事）**
-
-Settings → Pages → Source: *Deploy from a branch* → Branch: `master`，Folder: `/docs` → Save。
-之后访问 `https://<用户名>.github.io/ubuntu-pad-keyboard/`。
-
-**方式 B：Actions（已随仓库提供）**
-
-`.github/workflows/pages.yml` 会在推送 `docs/` 变更时自动发布。用这条要先在
-Settings → Pages → Source 选 *GitHub Actions*。
-
-两种方式二选一，不要同时开。
-
-## Gitee Pages
-
-Gitee Pages 免费版只能选「分支」，不能选子目录，所以 `docs/` 里的站点需要位于某个分支的根：
-
-```bash
-# 把 docs/ 的内容推到 pages 分支（在仓库根执行）
-git subtree push --prefix docs origin pages
-```
-
-然后 服务 → Gitee Pages → 部署分支选 `pages`。（若已开通 Pages Pro，也可以直接部署
-`master` 分支的 `docs/` 目录。）
-
-用 `git subtree push` 前如果 `pages` 分支还不存在，先建一个空分支：
-`git push origin master:pages`。GitHub 镜像侧不需要重复这一套，`pages.yml` 已经处理好。
 
 ## 改内容
 
