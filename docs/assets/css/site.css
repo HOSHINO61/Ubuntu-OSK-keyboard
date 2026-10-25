@@ -178,6 +178,13 @@ p{margin:0}
 }
 .hero-note svg{width:15px;height:15px;flex:none;margin-top:3px;color:var(--amber)}
 .hero-note b{color:var(--text-2);font-weight:650}
+.hero-tip{
+  display:inline-flex;align-items:center;gap:8px;margin-top:16px;
+  padding:7px 14px;border-radius:100px;
+  border:1px solid rgba(95,214,138,.32);background:rgba(95,214,138,.1);
+  font-size:12.8px;font-weight:600;color:#8ff0b4;
+}
+.hero-tip svg{width:15px;height:15px;flex:none}
 .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
 .hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
 .chip{

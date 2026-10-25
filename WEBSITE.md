@@ -1,6 +1,7 @@
 # 项目网站
 
-`docs/` 目录是纯静态站点，可直接拷到任意 Web 服务器发布（不依赖 GitHub/Gitee Pages，也不需要 CI）。
+`docs/` 目录是纯静态站点，**实际发布在 https://mybailu.cn/osk/**。
+不依赖 GitHub/Gitee Pages，也不需要 CI，把 `docs/` 拷到任意 Web 服务器即可。
 
 - 首页：`docs/index.html` —— 定位、三档尺寸交互对比、特性、安装、下载
 - 技术页：`docs/tech.html` —— 十一条死路、工作原理图、中文输入三条通道、踩坑、兼容性
