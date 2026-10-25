@@ -1,4 +1,4 @@
-# opd2413-keyboard
+# OSK-Keyboard
 
 一加 Pad 2 Pro（OPD2413 / `erhai`）在 **GNOME 50 Wayland** 下可用的屏幕键盘。
 PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用抽屉里按需开关。
@@ -88,7 +88,7 @@ GNOME Shell 进程
 
 | 功能 | 入口 |
 |---|---|
-| 显示/隐藏 | 系统菜单「屏幕键盘」/ 应用抽屉 `OPD2413-Keyboard` / 键盘上的 `✕` |
+| 显示/隐藏 | 系统菜单「屏幕键盘」/ 应用抽屉 `OSK-Keyboard` / 键盘上的 `✕` |
 | 收起成细条 | 拖动条 `⌄` / `⌃` |
 | 键盘尺寸 | 拖动条右侧 `小` `中` `大`（三档，跨登录记忆） |
 | 拖动定位 | 按住拖动条 `⠿ 拖动`（位置跨登录记忆） |
@@ -160,7 +160,7 @@ scale_large=1.00
 ## 安装
 
 ```bash
-sudo apt install ./dist/opd2413-keyboard_1.0.1_arm64.deb
+sudo apt install ./dist/osk-keyboard_2.0.0_arm64.deb
 ```
 
 装完建议**重启**（不建议只注销：部分设备的 gdm 登录界面偶发黑屏 + 触屏失效）。
@@ -169,18 +169,27 @@ GNOME 只在 shell 启动时扫描扩展目录，所以必须重启一次会话�
 之后两种方式开关键盘：
 
 - 右上角系统菜单 → **屏幕键盘** 开关
-- 应用抽屉 → **OPD2413-Keyboard** 图标
+- 应用抽屉 → **OSK-Keyboard** 图标
 
 卸载：
 
 ```bash
-sudo apt remove opd2413-keyboard
+sudo apt remove osk-keyboard
 ```
 
 用户配置 `~/.config/erhai-osk/`（位置、开关状态）会保留。
 
-> 若机器上装过旧的 `1.0.0` 包，`1.0` 会被 dpkg 视为降级，需要
-> `sudo apt install -y --allow-downgrades ./dist/opd2413-keyboard_1.0.1_arm64.deb`。
+> **从旧包升级**：v1.0.x 的包名是 `opd2413-keyboard`，2.0.0 起改为
+> `osk-keyboard`。control 里带了 `Conflicts`/`Replaces`，正常 `apt install` 会自动
+> 卸掉旧包；如果用的是裸 `dpkg -i`，先手动卸一次：
+>
+> ```bash
+> sudo apt remove opd2413-keyboard
+> sudo apt install ./dist/osk-keyboard_2.0.0_arm64.deb
+> ```
+>
+> 扩展 UUID（`erhai-osk@local`）和配置目录（`~/.config/erhai-osk/`）都没变，
+> 位置、开关状态、尺寸档位会保留。
 
 ### 从源码构建
 
@@ -188,24 +197,24 @@ sudo apt remove opd2413-keyboard
 
 ```bash
 sh packaging/build-deb.sh
-# → dist/opd2413-keyboard_1.0.1_arm64.deb
+# → dist/osk-keyboard_2.0.0_arm64.deb
 ```
 
-版本号与架构都取自 `packaging/opd2413-keyboard/DEBIAN/control`，
+版本号与架构都取自 `packaging/osk-keyboard/DEBIAN/control`，
 产物文件名自动跟随。
 
 ### 换行符（重要）
 
 `.gitattributes` 强制 `eol=lf`，这是刻意的：
 
-- `scripts/*.sh`、`packaging/opd2413-keyboard/DEBIAN/*` 是 Linux 脚本，
+- `scripts/*.sh`、`packaging/osk-keyboard/DEBIAN/*` 是 Linux 脚本，
   若被检出成 CRLF，运行时报 `bad interpreter: /bin/sh^M`，安装会直接失败
 - `*.deb` 标为 `binary`，不做任何转换
 
 在 Windows 上克隆后如果不小心改坏了换行符，可以这样检查：
 
 ```bash
-git ls-files --eol scripts/ packaging/opd2413-keyboard/DEBIAN/
+git ls-files --eol scripts/ packaging/osk-keyboard/DEBIAN/
 ```
 
 **不要删除 `.gitattributes`**，也不要用白名单式 `.gitignore` 把它排除掉。
@@ -222,13 +231,13 @@ dist/                        构建产物 (.deb)
 packaging/
   build-deb.sh               打包脚本
   README.md                  打包说明（构建、命名、已知限制）
-  opd2413-keyboard/DEBIAN/   control / postinst / postrm
+  osk-keyboard/DEBIAN/   control / postinst / postrm
 scripts/
   erhai-osk-ext/             扩展源码
     extension.js
     metadata.json
-  opd2413-keyboard-toggle.sh 应用图标调用的开关脚本
-  opd2413-keyboard.desktop   应用抽屉入口
+  osk-keyboard-toggle.sh 应用图标调用的开关脚本
+  osk-keyboard.desktop   应用抽屉入口
   sync-github.sh             把 master 重放为 GitHub 身份并强推（见下文）
 docs/
   屏幕键盘-方案.md            完整方案：逐条排查、实现细节、全部踩坑

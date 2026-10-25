@@ -1,5 +1,5 @@
 #!/bin/sh
-# OPD2413-Keyboard -- show/hide the on-screen keyboard.
+# OSK-Keyboard -- show/hide the on-screen keyboard.
 #
 # This drives the SAME state as the Quick Settings switch, through
 # ~/.config/erhai-osk/visible (the extension watches that file).  The earlier

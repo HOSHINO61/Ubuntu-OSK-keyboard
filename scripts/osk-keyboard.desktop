@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=OPD2413-Keyboard
-Name[zh_CN]=OPD2413-Keyboard
+Name=OSK-Keyboard
+Name[zh_CN]=OSK-Keyboard
 Comment=Toggle the on-screen keyboard on/off
 Comment[zh_CN]=开/关屏幕键盘
-Exec=opd2413-keyboard
+Exec=osk-keyboard
 Icon=input-keyboard
 Terminal=false
 Categories=Utility;Accessibility;

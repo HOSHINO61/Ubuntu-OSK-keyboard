@@ -6,7 +6,7 @@
 *.sh            text eol=lf
 *.desktop       text eol=lf
 DEBIAN/*        text eol=lf
-packaging/opd2413-keyboard/DEBIAN/* text eol=lf
+packaging/osk-keyboard/DEBIAN/* text eol=lf
 
 # 二进制文件，不要做任何转换
 *.deb           binary

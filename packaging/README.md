@@ -1,6 +1,6 @@
-# 打包说明：opd2413-keyboard
+# 打包说明：osk-keyboard
 
-屏幕键盘的 Debian 包。源码在 `scripts/`，包定义为 `packaging/opd2413-keyboard/`，
+屏幕键盘的 Debian 包。源码在 `scripts/`，包定义为 `packaging/osk-keyboard/`，
 产物在 `dist/`。
 
 ---
@@ -26,18 +26,18 @@
 sh packaging/build-deb.sh
 ```
 
-产物：`dist/opd2413-keyboard_<版本>_<架构>.deb`
+产物：`dist/osk-keyboard_<版本>_<架构>.deb`
 
 脚本做的事：
 
 1. 从 `DEBIAN/control` 读版本号与架构
-2. 把 `scripts/` 里的源文件复制进 `packaging/opd2413-keyboard/usr/`：
+2. 把 `scripts/` 里的源文件复制进 `packaging/osk-keyboard/usr/`：
 
    | 源 | 目标 |
    |---|---|
    | `scripts/erhai-osk-ext/extension.js`、`metadata.json` | `/usr/share/gnome-shell/extensions/erhai-osk@local/` |
-   | `scripts/opd2413-keyboard-toggle.sh` | `/usr/bin/opd2413-keyboard` |
-   | `scripts/opd2413-keyboard.desktop` | `/usr/share/applications/` |
+   | `scripts/osk-keyboard-toggle.sh` | `/usr/bin/osk-keyboard` |
+   | `scripts/osk-keyboard.desktop` | `/usr/share/applications/` |
 
 3. 显式 `chmod`（`dpkg-deb` 会保留目录树的权限位）
 4. 把 `postinst` 里的 `@VERSION@` 替换为真实版本
@@ -51,9 +51,9 @@ sh packaging/build-deb.sh
 ## 安装 / 卸载
 
 ```bash
-sudo apt install ./dist/opd2413-keyboard_1.0_arm64.deb
-sudo apt remove  opd2413-keyboard
-sudo apt purge   opd2413-keyboard
+sudo apt install ./dist/osk-keyboard_2.0.0_arm64.deb
+sudo apt remove  osk-keyboard
+sudo apt purge   osk-keyboard
 ```
 
 ⚠️ **如果机器上装过 `1.0.0`（旧命名），升级到 `1.0` 会被当成"降级"**：
@@ -66,7 +66,7 @@ E: 降级软件包同时使用了 -y 选项，但是没有用 --allow-downgrades
 dpkg 的版本比较是**分段**的，`1.0` 比 `1.0.0` 旧。首次从旧的 `all` 包迁移时用：
 
 ```bash
-sudo apt install -y --allow-downgrades ./dist/opd2413-keyboard_1.0_arm64.deb
+sudo apt install -y --allow-downgrades ./dist/osk-keyboard_2.0.0_arm64.deb
 ```
 
 之后同版本重装、或升到 `1.0.1` 都不再需要这个开关。
@@ -77,7 +77,7 @@ sudo apt install -y --allow-downgrades ./dist/opd2413-keyboard_1.0_arm64.deb
 
 ## 命名约定
 
-`opd2413-keyboard_<版本>_<架构>.deb`，版本与架构都直接来自 `DEBIAN/control`，
+`osk-keyboard_<版本>_<架构>.deb`，版本与架构都直接来自 `DEBIAN/control`，
 改 `control` 就同时改了文件名和包内字段，两者不会脱节。
 
 当前为 `1.0` + `arm64`。注意 `Architecture: arm64` 会让 dpkg **拒绝在 x86
@@ -96,15 +96,15 @@ sudo apt install -y --allow-downgrades ./dist/opd2413-keyboard_1.0_arm64.deb
 
 `postinst` 的处理：把用户级副本**改名**为 `erhai-osk@local.hand-installed`
 而不是删除（用户可能想回溯），然后清掉会遮蔽包内文件的
-`/usr/local/bin/opd2413-keyboard` 和 `~/.local/share/applications/opd2413-keyboard.desktop`。
+`/usr/local/bin/osk-keyboard` 和 `~/.local/share/applications/osk-keyboard.desktop`。
 
 ### 2. 桌面项的 `Exec=` 不能写死路径
 
-原先是 `Exec=/usr/local/bin/opd2413-keyboard`。改成 deb 后启动器在 `/usr/bin`，
+原先是 `Exec=/usr/local/bin/osk-keyboard`。改成 deb 后启动器在 `/usr/bin`，
 按 Debian 惯例应当**不带路径**、依赖 `PATH`：
 
 ```ini
-Exec=opd2413-keyboard
+Exec=osk-keyboard
 ```
 
 ### 3. 卸载不要碰用户数据
@@ -118,15 +118,15 @@ Exec=opd2413-keyboard
 ## 验证记录（2026-10-23，实机）
 
 ```
-构建      opd2413-keyboard_1.0_arm64.deb（10,980 字节）
-安装      dpkg -l → ii  opd2413-keyboard 1.0 arm64
+构建      osk-keyboard_2.0.0_arm64.deb（10,980 字节）
+安装      dpkg -l → ii  osk-keyboard 1.0 arm64
 字段      Version: 1.0    Architecture: arm64   （与文件名一致）
-文件      /usr/bin/opd2413-keyboard, /usr/share/applications/…,
+文件      /usr/bin/osk-keyboard, /usr/share/applications/…,
           /usr/share/gnome-shell/extensions/erhai-osk@local/{extension.js,metadata.json}
 手抄本    已移到 erhai-osk@local.hand-installed
-旧启动器  /usr/local/bin/opd2413-keyboard 已移除
+旧启动器  /usr/local/bin/osk-keyboard 已移除
 旧桌面项  ~/.local/share/applications/… 已移除
-启动器    opd2413-keyboard → keyboard on / keyboard off（往返正常）
+启动器    osk-keyboard → keyboard on / keyboard off（往返正常）
 卸载      系统目录与启动器清空，~/.config/erhai-osk/ 保留
 重装      回到 ii 状态
 ```
@@ -135,7 +135,7 @@ Exec=opd2413-keyboard
 
 ## 改版本号
 
-改 `packaging/opd2413-keyboard/DEBIAN/control` 里的 `Version:`（和需要时的
+改 `packaging/osk-keyboard/DEBIAN/control` 里的 `Version:`（和需要时的
 `Architecture:`），重新构建即可。`postinst` 里的版本是构建时替换的，不要手写。
 
 ---
