@@ -19,8 +19,8 @@ PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用
 
 | 项目 | 要求 |
 |---|---|
-| 设备 | 一加平板 2 Pro（OPD2413 / `erhai` / SM8750P） |  其它平板自测
-| 系统 | 已按 [Ubuntu for OnePlus Pad 2 Pro](https://github.com/yzddmr6/onepluspad-2pro-mainline/blob/main/README.zh-CN.md) 完成安装 | 其它平板请按型号安装
+| 设备 | 一加平板 2 Pro（OPD2413 / `erhai` / SM8750P，其它平板自测） |
+| 系统 | 已按 [Ubuntu for OnePlus Pad 2 Pro](https://github.com/yzddmr6/onepluspad-2pro-mainline/blob/main/README.zh-CN.md) 完成安装，其它平板请按型号安装 | 
 | 桌面 | **GNOME 50、Wayland 会话** |
 
 上游项目一般提供了分区、系统安装和硬件适配的完整流程；本仓库只负责其中的
