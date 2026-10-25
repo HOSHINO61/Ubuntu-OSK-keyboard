@@ -5,7 +5,7 @@
 # Produces dist/osk-keyboard_<ver>_<arch>.deb from the files already in this
 # repo, so the package can never drift from the source tree.
 #
-# Before 2.0.0 the package was called opd2413-keyboard; the new name carries
+# Before 1.0.1b the package was called opd2413-keyboard; the new name carries
 # Conflicts/Replaces so a plain `apt install` migrates cleanly.
 set -e
 

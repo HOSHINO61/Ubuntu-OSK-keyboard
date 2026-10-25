@@ -160,7 +160,7 @@ scale_large=1.00
 ## 安装
 
 ```bash
-sudo apt install ./dist/osk-keyboard_2.0.0_arm64.deb
+sudo apt install ./dist/osk-keyboard_1.0.1b_arm64.deb
 ```
 
 装完建议**重启**（不建议只注销：部分设备的 gdm 登录界面偶发黑屏 + 触屏失效）。
@@ -179,13 +179,13 @@ sudo apt remove osk-keyboard
 
 用户配置 `~/.config/erhai-osk/`（位置、开关状态）会保留。
 
-> **从旧包升级**：v1.0.x 的包名是 `opd2413-keyboard`，2.0.0 起改为
+> **从旧包升级**：v1.0.x 的包名是 `opd2413-keyboard`，从 1.0.1b 起改为
 > `osk-keyboard`。control 里带了 `Conflicts`/`Replaces`，正常 `apt install` 会自动
 > 卸掉旧包；如果用的是裸 `dpkg -i`，先手动卸一次：
 >
 > ```bash
 > sudo apt remove opd2413-keyboard
-> sudo apt install ./dist/osk-keyboard_2.0.0_arm64.deb
+> sudo apt install ./dist/osk-keyboard_1.0.1b_arm64.deb
 > ```
 >
 > 扩展 UUID（`erhai-osk@local`）和配置目录（`~/.config/erhai-osk/`）都没变，
@@ -197,7 +197,7 @@ sudo apt remove osk-keyboard
 
 ```bash
 sh packaging/build-deb.sh
-# → dist/osk-keyboard_2.0.0_arm64.deb
+# → dist/osk-keyboard_1.0.1b_arm64.deb
 ```
 
 版本号与架构都取自 `packaging/osk-keyboard/DEBIAN/control`，
