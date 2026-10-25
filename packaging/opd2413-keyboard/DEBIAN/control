@@ -1,5 +1,5 @@
 Package: opd2413-keyboard
-Version: 1.1
+Version: 1.0.1
 Architecture: arm64
 Maintainer: erhai <user@opd2413.local>
 Section: utils

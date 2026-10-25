@@ -147,16 +147,16 @@ scale_large=1.00
 
 Quick Settings 里能看到「屏幕键盘」开关，键盘处于「小」档（WiFi 名称已打码）：
 
-![Quick Settings 里的屏幕键盘开关](docs/images/keyboard-1.1-quick-settings.png)
+![Quick Settings 里的屏幕键盘开关](docs/images/keyboard-quick-settings.png)
 
 三档尺寸按钮在拖动条右侧，当前档填充高亮：
 
-![三档尺寸](docs/images/keyboard-1.1-sizes.png)
+![三档尺寸](docs/images/keyboard-sizes.png)
 
 ## 安装
 
 ```bash
-sudo apt install ./dist/opd2413-keyboard_1.1_arm64.deb
+sudo apt install ./dist/opd2413-keyboard_1.0.1_arm64.deb
 ```
 
 装完**注销重新登录一次**（GNOME 只在 shell 启动时扫描扩展目录）。
@@ -175,7 +175,7 @@ sudo apt remove opd2413-keyboard
 用户配置 `~/.config/erhai-osk/`（位置、开关状态）会保留。
 
 > 若机器上装过旧的 `1.0.0` 包，`1.0` 会被 dpkg 视为降级，需要
-> `sudo apt install -y --allow-downgrades ./dist/opd2413-keyboard_1.1_arm64.deb`。
+> `sudo apt install -y --allow-downgrades ./dist/opd2413-keyboard_1.0.1_arm64.deb`。
 
 ### 从源码构建
 
@@ -183,7 +183,7 @@ sudo apt remove opd2413-keyboard
 
 ```bash
 sh packaging/build-deb.sh
-# → dist/opd2413-keyboard_1.1_arm64.deb
+# → dist/opd2413-keyboard_1.0.1_arm64.deb
 ```
 
 版本号与架构都取自 `packaging/opd2413-keyboard/DEBIAN/control`，
