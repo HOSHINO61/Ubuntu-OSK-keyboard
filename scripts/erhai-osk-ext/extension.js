@@ -66,23 +66,28 @@ const COLORS = {
     on: 'background-color: #ffd479; color: #1e2022;',
 };
 
-// Three sizes, picked from the grip bar, targeting 50% / 65% / 80% of the
-// screen width on this tablet's 1734px-wide logical screen.
+// Three sizes, picked from the grip bar.  Measured on this tablet (1696px-wide
+// logical screen, logged by _reflow):
 //
-// The panel is proportional to the scale factor, and the constant was measured
-// rather than guessed: scale 0.65 rendered 52% of the screen, so the panel is
-// ~1387px wide at 1.00 (0.52 * 1734 / 0.65).  The first estimate (1310px, from
-// the design notes) made every step one size too wide.
+//     scale 0.72 -> 927x349  (55%)
+//     scale 0.85 -> 1120x421 (66%)
+//     scale 1.03 -> 1342x493 (79%)
 //
-// The medium step is no longer the 1.00 design baseline -- the baseline stays
-// in the px values, the steps just sit around it.
+// The panel grows roughly linearly with the factor, but not exactly: at some
+// sizes a text label ('Shift', 'Ctrl') is wider than the key's min-width and
+// pushes the row out, so the proportions drift by a couple of percent.  Tune
+// against the logged numbers, not against a formula.
+//
+// The 1.00 design baseline stays in the px values; the steps just sit around
+// it.  Earlier attempts used 1310px from the design notes as the panel width at
+// 1.00 and came out one size too wide everywhere.
 // ~/.config/erhai-osk/position.kf ([layout] scale_small= / scale_medium= /
 // scale_large=) can override all three, so tuning needs neither a rebuild nor
 // a re-login.
 const SIZE_STEPS = [
-    {name: 'small', label: '小', scale: 0.63},
-    {name: 'medium', label: '中', scale: 0.82},
-    {name: 'large', label: '大', scale: 1.01},
+    {name: 'small', label: '小', scale: 0.72},
+    {name: 'medium', label: '中', scale: 0.85},
+    {name: 'large', label: '大', scale: 1.03},
 ];
 const DEFAULT_SIZE = 'medium';
 const SCALE_MIN = 0.40;
