@@ -149,15 +149,13 @@ scale_large=1.00
 
 ![Quick Settings 里的屏幕键盘开关（中档）](docs/images/keyboard-quick-settings.png)
 
-「小」档：
+三档尺寸（按钮在拖动条右侧，当前档填充高亮）：
 
-![Quick Settings 里的屏幕键盘开关（小档）](docs/images/keyboard-quick-settings-small.png)
+| 小（55%） | 中（66%） | 大（76%） |
+|---|---|---|
+| ![小](docs/images/keyboard-sizes-small.png) | ![中](docs/images/keyboard-sizes.png) | ![大](docs/images/keyboard-sizes-large.png) |
 
-三档按钮在拖动条右侧，当前档填充高亮：
-
-| 小（55%） | 中（66%） |
-|---|---|
-| ![小](docs/images/keyboard-sizes-small.png) | ![中](docs/images/keyboard-sizes.png) |
+另外两档的全屏截图：[小档](docs/images/keyboard-quick-settings-small.png) · [大档](docs/images/keyboard-quick-settings-large.png)
 
 ## 安装
 
