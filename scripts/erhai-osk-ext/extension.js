@@ -66,15 +66,18 @@ const COLORS = {
     on: 'background-color: #ffd479; color: #1e2022;',
 };
 
-// Three sizes, picked from the grip bar.  The medium step is the reference
-// (1.00); small is the size a normal desktop OSK has, large is ~12% bigger so
-// it stays readable without eating the whole screen.  A file in
-// ~/.config/erhai-osk/position.kf ([layout] scale_small= / scale_large=) can
-// override the two factors, so tuning needs neither a rebuild nor a re-login.
+// Three sizes, picked from the grip bar.  The factors are chosen so the panel
+// covers roughly 50% / 65% / 80% of the screen width on the 1734px-wide logical
+// screen of this tablet (panel width ~= scale * 1310px).  The medium step is no
+// longer the 1.00 design baseline: the baseline stays in the px values, the
+// steps just move around it.
+// ~/.config/erhai-osk/position.kf ([layout] scale_small= / scale_medium= /
+// scale_large=) can override all three, so tuning needs neither a rebuild nor
+// a re-login.
 const SIZE_STEPS = [
-    {name: 'small', label: '小', scale: 0.65},
-    {name: 'medium', label: '中', scale: 1.00},
-    {name: 'large', label: '大', scale: 1.12},
+    {name: 'small', label: '小', scale: 0.66},
+    {name: 'medium', label: '中', scale: 0.86},
+    {name: 'large', label: '大', scale: 1.06},
 ];
 const DEFAULT_SIZE = 'medium';
 const SCALE_MIN = 0.40;
@@ -988,6 +991,7 @@ export default class ErhaiOSK extends Extension {
                 y: kf.get_integer('position', 'y'),
                 size: str('size'),
                 scale_small: num('scale_small'),
+                scale_medium: num('scale_medium'),
                 scale_large: num('scale_large'),
             };
         } catch (e) {
@@ -1009,7 +1013,7 @@ export default class ErhaiOSK extends Extension {
             kf.set_integer('position', 'x', Math.round(this._posX));
             kf.set_integer('position', 'y', Math.round(this._posY));
             kf.set_string('layout', 'size', this._sizeName || DEFAULT_SIZE);
-            for (const key of ['scale_small', 'scale_large']) {
+            for (const key of ['scale_small', 'scale_medium', 'scale_large']) {
                 const value = prev ? prev[key] : null;
                 if (typeof value === 'number')
                     kf.set_string('layout', key, String(value));
@@ -1020,6 +1024,7 @@ export default class ErhaiOSK extends Extension {
                 y: Math.round(this._posY),
                 size: this._sizeName || DEFAULT_SIZE,
                 scale_small: prev ? prev.scale_small : null,
+                scale_medium: prev ? prev.scale_medium : null,
                 scale_large: prev ? prev.scale_large : null,
             };
         } catch (e) {
