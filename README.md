@@ -1,6 +1,6 @@
 # OSK-Keyboard
 
-一加 Pad 2 Pro（OPD2413 / `erhai`）在 **GNOME 50 Wayland** 下可用的屏幕键盘。
+一加 Pad 2 Pro（OPD2413 / `erhai`）在 **GNOME 50 Wayland** 下可用的屏幕键盘，其它平板请自测。
 PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用抽屉里按需开关。
 
 - 实测环境：一加 Pad 2 Pro，Ubuntu 26.04.1 LTS，GNOME Shell 50.1，arm64
@@ -8,7 +8,7 @@ PC 风格布局、大按键、**支持中文输入**、可在系统菜单/应用
 
 > **中国大陆用户建议访问 [Gitee 镜像](https://gitee.com/HOSHINO6/Ubuntu-OSD-keyboard)**，
 > 下载更快、连接更稳定；
-> **海外用户建议使用 [GitHub](https://github.com/HOSHINO61/opd2413-keyboard)**。
+> **海外用户建议使用 [GitHub](https://github.com/HOSHINO61/Ubuntu-OSD-keyboard)**。
 > 两个仓库内容对等，均可使用。
 
 ---
