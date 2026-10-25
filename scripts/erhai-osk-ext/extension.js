@@ -66,18 +66,23 @@ const COLORS = {
     on: 'background-color: #ffd479; color: #1e2022;',
 };
 
-// Three sizes, picked from the grip bar.  The factors are chosen so the panel
-// covers roughly 50% / 65% / 80% of the screen width on the 1734px-wide logical
-// screen of this tablet (panel width ~= scale * 1310px).  The medium step is no
-// longer the 1.00 design baseline: the baseline stays in the px values, the
-// steps just move around it.
+// Three sizes, picked from the grip bar, targeting 50% / 65% / 80% of the
+// screen width on this tablet's 1734px-wide logical screen.
+//
+// The panel is proportional to the scale factor, and the constant was measured
+// rather than guessed: scale 0.65 rendered 52% of the screen, so the panel is
+// ~1387px wide at 1.00 (0.52 * 1734 / 0.65).  The first estimate (1310px, from
+// the design notes) made every step one size too wide.
+//
+// The medium step is no longer the 1.00 design baseline -- the baseline stays
+// in the px values, the steps just sit around it.
 // ~/.config/erhai-osk/position.kf ([layout] scale_small= / scale_medium= /
 // scale_large=) can override all three, so tuning needs neither a rebuild nor
 // a re-login.
 const SIZE_STEPS = [
-    {name: 'small', label: '小', scale: 0.66},
-    {name: 'medium', label: '中', scale: 0.86},
-    {name: 'large', label: '大', scale: 1.06},
+    {name: 'small', label: '小', scale: 0.63},
+    {name: 'medium', label: '中', scale: 0.82},
+    {name: 'large', label: '大', scale: 1.01},
 ];
 const DEFAULT_SIZE = 'medium';
 const SCALE_MIN = 0.40;
@@ -516,10 +521,17 @@ export default class ErhaiOSK extends Extension {
             // top-left corner.  Let _placeIfNeeded() do the first one.
             if (!this._placed)
                 return GLib.SOURCE_REMOVE;
-            const [, newHeight] = this._box.get_size();
+            const [width, newHeight] = this._box.get_size();
             this._applyPosition(this._posX, this._posY + (oldHeight - newHeight));
             // Clamping may have moved us; persist whatever is now on screen.
             this._saveConfig();
+            // Printed so the size can be checked against the screen without a
+            // screenshot: percentage of the monitor width is what we tune for.
+            const mon = Main.layoutManager.primaryMonitor;
+            const pct = mon ? Math.round(width / mon.width * 100) : 0;
+            log(`erhai-osk: panel ${width}x${newHeight} `
+                + `(${pct}% of ${mon ? mon.width : 0}px, step ${this._sizeName} `
+                + `scale ${this._scale})`);
             return GLib.SOURCE_REMOVE;
         });
     }
