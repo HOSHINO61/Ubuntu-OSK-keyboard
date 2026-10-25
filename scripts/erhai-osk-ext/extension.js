@@ -976,14 +976,13 @@ export default class ErhaiOSK extends Extension {
             const kf = new GLib.KeyFile();
             kf.load_from_file(path, GLib.KeyFileFlags.NONE);
 
-            let hasLayout = false;
-            try {
-                hasLayout = kf.get_groups().includes('layout');
-            } catch (e) { /* older files have no groups listing */ }
-
+            // Read straight out of [layout] and let get_string() throw when the
+            // group or key is missing.  Do NOT gate this on
+            // kf.get_groups().includes('layout'): GJS maps that gchar** out
+            // param to a [names, length] tuple, so the call returns
+            // [["position","layout"], 2] and includes() never matches -- which
+            // silently disabled every override.
             const str = key => {
-                if (!hasLayout)
-                    return null;
                 try {
                     return kf.get_string('layout', key);
                 } catch (e) {
