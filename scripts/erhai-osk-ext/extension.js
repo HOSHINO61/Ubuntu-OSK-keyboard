@@ -71,7 +71,7 @@ const COLORS = {
 //
 //     scale 0.72 -> 927x349  (55%)
 //     scale 0.85 -> 1120x421 (66%)
-//     scale 1.03 -> 1342x493 (79%)
+//     scale 0.99 -> ~1293x475 (76%)
 //
 // The panel grows roughly linearly with the factor, but not exactly: at some
 // sizes a text label ('Shift', 'Ctrl') is wider than the key's min-width and
@@ -87,7 +87,7 @@ const COLORS = {
 const SIZE_STEPS = [
     {name: 'small', label: '小', scale: 0.72},
     {name: 'medium', label: '中', scale: 0.85},
-    {name: 'large', label: '大', scale: 1.03},
+    {name: 'large', label: '大', scale: 0.99},
 ];
 const DEFAULT_SIZE = 'medium';
 const SCALE_MIN = 0.40;
