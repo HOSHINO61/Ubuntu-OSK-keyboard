@@ -55,6 +55,10 @@ const STATE_FILE = 'erhai-osk/visible';
 // ---- styling ---------------------------------------------------------
 // Sized for older eyes and unsteady fingers: large glyphs, tall keys and a
 // brighter, higher-contrast palette than a typical desktop theme.
+//
+// Every dimension below is written for the *medium* size and multiplied by a
+// per-size scale factor, so the three sizes stay proportional instead of
+// drifting apart.  See SIZE_STEPS / _setSize().
 const COLORS = {
     key: 'background-color: #4a4e53; color: #ffffff;',
     mod: 'background-color: #5a5f65; color: #ffdc8a;',
@@ -62,20 +66,65 @@ const COLORS = {
     on: 'background-color: #ffd479; color: #1e2022;',
 };
 
-function keyStyle(kind, minWidth) {
-    return `${COLORS[kind]} border-radius: 8px; padding: 14px 6px;`
-        + ` margin: 3px; font-size: 24px; min-width: ${minWidth}px;`;
+// Three sizes, picked from the grip bar.  ~20% either side of the medium size
+// keeps the small one usable on a 3392px-wide screen and the large one still
+// on-screen.
+const SIZE_STEPS = [
+    {name: 'small', label: '小', scale: 0.80},
+    {name: 'medium', label: '中', scale: 1.00},
+    {name: 'large', label: '大', scale: 1.28},
+];
+const DEFAULT_SIZE = 'medium';
+
+function sizeStep(name) {
+    return SIZE_STEPS.find(s => s.name === name) ?? SIZE_STEPS[1];
 }
 
-const BOX = 'background-color: rgba(18,20,22,0.97); border-radius: 16px; padding: 10px;';
-const GRIP = 'background-color: #33373b; color: #b0b8c0; border-radius: 10px;'
-    + ' padding: 8px 20px; margin: 3px; font-size: 17px;';
-const GRIP_BTN = 'background-color: #474c52; color: #ffd479; border-radius: 8px;'
-    + ' padding: 5px 20px; margin: 3px 3px 3px 12px; font-size: 22px;';
-const CLOSE_BTN = 'background-color: #553a3a; color: #ffabab; border-radius: 8px;'
-    + ' padding: 5px 20px; margin: 3px; font-size: 22px;';
-const SHIFT_GLYPH = 'color: #a8b0b8; font-size: 15px;';
-const SHIFT_GLYPH_ON = 'color: #ffffff; font-size: 15px;';
+// Whole pixels only: fractional sizes give blurry glyphs in St.
+const px = (value, scale) => `${Math.max(1, Math.round(value * scale))}px`;
+
+function keyStyle(kind, minWidth, scale = 1) {
+    return `${COLORS[kind]} border-radius: ${px(8, scale)};`
+        + ` padding: ${px(14, scale)} ${px(6, scale)};`
+        + ` margin: ${px(3, scale)};`
+        + ` font-size: ${px(24, scale)};`
+        + ` min-width: ${px(minWidth, scale)};`;
+}
+
+const boxStyle = scale =>
+    'background-color: rgba(18,20,22,0.97);'
+    + ` border-radius: ${px(16, scale)}; padding: ${px(10, scale)};`;
+
+const gripStyle = scale =>
+    'background-color: #33373b; color: #b0b8c0;'
+    + ` border-radius: ${px(10, scale)};`
+    + ` padding: ${px(8, scale)} ${px(20, scale)};`
+    + ` margin: ${px(3, scale)}; font-size: ${px(17, scale)};`;
+
+const gripBtnStyle = scale =>
+    'background-color: #474c52; color: #ffd479;'
+    + ` border-radius: ${px(8, scale)};`
+    + ` padding: ${px(5, scale)} ${px(20, scale)};`
+    + ` margin: ${px(3, scale)} ${px(3, scale)} ${px(3, scale)} ${px(12, scale)};`
+    + ` font-size: ${px(22, scale)};`;
+
+const closeBtnStyle = scale =>
+    'background-color: #553a3a; color: #ffabab;'
+    + ` border-radius: ${px(8, scale)};`
+    + ` padding: ${px(5, scale)} ${px(20, scale)};`
+    + ` margin: ${px(3, scale)}; font-size: ${px(22, scale)};`;
+
+// The size selector reads as a segmented control: the active step is filled,
+// the other two stay quiet so they never compete with the keys.
+const sizeBtnStyle = (active, scale) =>
+    `background-color: ${active ? '#ffd479' : '#3c4147'};`
+    + ` color: ${active ? '#1e2022' : '#c9d1d9'};`
+    + ` border-radius: ${px(8, scale)};`
+    + ` padding: ${px(5, scale)} ${px(16, scale)};`
+    + ` margin: ${px(3, scale)}; font-size: ${px(20, scale)};`;
+
+const shiftGlyphStyle = (on, scale) =>
+    `color: ${on ? '#ffffff' : '#a8b0b8'}; font-size: ${px(15, scale)};`;
 
 // ---- key descriptors -------------------------------------------------
 const ch = (base, shifted, minW = 64) => ({base, shifted, minW, kind: 'key'});
@@ -167,7 +216,7 @@ function makeQsClasses(QS) {
 
 export default class ErhaiOSK extends Extension {
     enable() {
-        log('erhai-osk: v12 enable (in-place visuals, shifted symbols)');
+        log('erhai-osk: v13 enable (sizes, in-place visuals, shifted symbols)');
         try {
             const seat = this._makeSeat();
             if (!seat) {
@@ -189,6 +238,18 @@ export default class ErhaiOSK extends Extension {
             this._letterKeys = [];
             this._shiftGlyphs = [];
             this._modButtons = [];
+            // Every button keeps its descriptor so a size change can restyle it
+            // in place (rebuilding would re-deliver an in-flight touch).
+            this._styledKeys = [];
+            this._sizeBtns = {};
+
+            // Restore the size before the rows are built, so the very first
+            // allocation is already the right size (no visible jump).
+            const cfg = this._loadConfig();
+            this._sizeName = cfg && SIZE_STEPS.some(s => s.name === cfg.size)
+                ? cfg.size : DEFAULT_SIZE;
+            this._scale = sizeStep(this._sizeName).scale;
+            this._savedConfig = cfg;
 
             this._hidden = false;
             this._hiddenByModal = false;
@@ -207,7 +268,7 @@ export default class ErhaiOSK extends Extension {
 
             this._box = new St.BoxLayout({
                 vertical: true,
-                style: BOX,
+                style: boxStyle(this._scale),
                 reactive: true,
                 x_align: Clutter.ActorAlign.START,
                 y_align: Clutter.ActorAlign.START,
@@ -244,9 +305,9 @@ export default class ErhaiOSK extends Extension {
                 .then(QS => this._addQuickSettings(QS))
                 .catch(e => log(`erhai-osk: quick settings unavailable: ${e}`));
 
-            log('erhai-osk: v12 enabled');
+            log('erhai-osk: v13 enabled');
         } catch (e) {
-            log(`erhai-osk: v12 enable failed: ${e}`);
+            log(`erhai-osk: v13 enable failed: ${e}`);
         }
     }
 
@@ -296,8 +357,11 @@ export default class ErhaiOSK extends Extension {
         this._letterKeys = [];
         this._shiftGlyphs = [];
         this._modButtons = [];
+        this._styledKeys = [];
+        this._sizeBtns = {};
+        this._savedConfig = null;
         this._vdev = null;
-        log('erhai-osk: v12 disabled');
+        log('erhai-osk: v13 disabled');
     }
 
     _makeSeat() {
@@ -341,7 +405,7 @@ export default class ErhaiOSK extends Extension {
     // ---- grip bar ----------------------------------------------------
     _buildGrip() {
         this._grip = new St.BoxLayout({
-            style: GRIP,
+            style: gripStyle(this._scale),
             x_align: Clutter.ActorAlign.CENTER,
         });
 
@@ -354,9 +418,26 @@ export default class ErhaiOSK extends Extension {
         this._dragArea.connect('touch-event', this._onGripTouch.bind(this));
         this._grip.add_child(this._dragArea);
 
+        // 小 / 中 / 大 -- a segmented control, the active step filled.
+        for (const step of SIZE_STEPS) {
+            const btn = new St.Button({
+                child: new St.Label({
+                    text: step.label,
+                    y_align: Clutter.ActorAlign.CENTER,
+                }),
+                style: sizeBtnStyle(step.name === this._sizeName, this._scale),
+                reactive: true,
+                can_focus: false,
+                track_hover: true,
+            });
+            btn.connect('clicked', () => this._setSize(step.name));
+            this._grip.add_child(btn);
+            this._sizeBtns[step.name] = btn;
+        }
+
         this._collapseBtn = new St.Button({
             child: new St.Label({text: '⌄', y_align: Clutter.ActorAlign.CENTER}),
-            style: GRIP_BTN,
+            style: gripBtnStyle(this._scale),
             reactive: true,
             can_focus: false,
             track_hover: true,
@@ -366,7 +447,7 @@ export default class ErhaiOSK extends Extension {
 
         this._closeBtn = new St.Button({
             child: new St.Label({text: '✕', y_align: Clutter.ActorAlign.CENTER}),
-            style: CLOSE_BTN,
+            style: closeBtnStyle(this._scale),
             reactive: true,
             can_focus: false,
             track_hover: true,
@@ -375,6 +456,70 @@ export default class ErhaiOSK extends Extension {
         this._grip.add_child(this._closeBtn);
 
         this._box.add_child(this._grip);
+    }
+
+    // ---- size (小 / 中 / 大) -----------------------------------------
+    // Restyle in place -- the rows are never rebuilt, so a touch that is down
+    // while the size changes still lands on the button it started on.
+    _setSize(name) {
+        if (!SIZE_STEPS.some(s => s.name === name) || name === this._sizeName)
+            return;
+
+        const [, oldHeight] = this._box ? this._box.get_size() : [0, 0];
+        this._sizeName = name;
+        this._scale = sizeStep(name).scale;
+        this._applyScale();
+        this._saveConfig();
+        log(`erhai-osk: size -> ${name} (scale ${this._scale})`);
+
+        // Keep the bottom edge where it is: the panel grows upward instead of
+        // pushing itself off the bottom of the screen.
+        this._reflow(oldHeight);
+    }
+
+    // Re-place the panel after its height changed, keeping the bottom edge put.
+    _reflow(oldHeight) {
+        GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+            if (!this._box)
+                return GLib.SOURCE_REMOVE;
+            // Before the first placement _posX/_posY are still 0,0; moving and
+            // persisting here would overwrite the remembered position with the
+            // top-left corner.  Let _placeIfNeeded() do the first one.
+            if (!this._placed)
+                return GLib.SOURCE_REMOVE;
+            const [, newHeight] = this._box.get_size();
+            this._applyPosition(this._posX, this._posY + (oldHeight - newHeight));
+            // Clamping may have moved us; persist whatever is now on screen.
+            this._saveConfig();
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    _applyScale() {
+        const s = this._scale;
+        if (this._box)
+            this._box.style = boxStyle(s);
+        if (this._grip)
+            this._grip.style = gripStyle(s);
+        if (this._collapseBtn)
+            this._collapseBtn.style = gripBtnStyle(s);
+        if (this._closeBtn)
+            this._closeBtn.style = closeBtnStyle(s);
+        for (const {btn, kind, minW, mod} of this._styledKeys) {
+            const active = mod ? this._modActive(mod) : false;
+            btn.style = keyStyle(active ? 'on' : kind, minW, s);
+        }
+        for (const glyph of this._shiftGlyphs)
+            glyph.style = shiftGlyphStyle(this._shift, s);
+        this._updateSizeButtons();
+    }
+
+    _updateSizeButtons() {
+        for (const step of SIZE_STEPS) {
+            const btn = this._sizeBtns[step.name];
+            if (btn)
+                btn.style = sizeBtnStyle(step.name === this._sizeName, this._scale);
+        }
     }
 
     // ---- key rows ----------------------------------------------------
@@ -410,7 +555,7 @@ export default class ErhaiOSK extends Extension {
         if (shiftedGlyph && !upperCaseLetter) {
             const glyphLabel = new St.Label({
                 text: shiftedGlyph,
-                style: SHIFT_GLYPH,
+                style: shiftGlyphStyle(false, this._scale),
                 x_align: Clutter.ActorAlign.CENTER,
             });
             content.add_child(glyphLabel);
@@ -428,18 +573,19 @@ export default class ErhaiOSK extends Extension {
 
         const btn = new St.Button({
             child: content,
-            style: keyStyle('key', def.minW),
+            style: keyStyle('key', def.minW, this._scale),
             reactive: true,
             can_focus: false,
             track_hover: true,
         });
         btn.connect('clicked', () => this._emitChar(def));
+        this._styledKeys.push({btn, kind: 'key', minW: def.minW, mod: null});
         return btn;
     }
 
     _plainKey(def) {
         const active = def.mod && this._modActive(def.mod);
-        const style = keyStyle(active ? 'on' : def.kind, def.minW);
+        const style = keyStyle(active ? 'on' : def.kind, def.minW, this._scale);
 
         const btn = new St.Button({
             child: new St.Label({
@@ -451,6 +597,9 @@ export default class ErhaiOSK extends Extension {
             reactive: true,
             can_focus: false,
             track_hover: true,
+        });
+        this._styledKeys.push({
+            btn, kind: def.kind, minW: def.minW, mod: def.mod ?? null,
         });
 
         if (def.ime) {
@@ -507,15 +656,17 @@ export default class ErhaiOSK extends Extension {
             label.text = upper ? def.base.toUpperCase() : def.base;
         }
         for (const glyph of this._shiftGlyphs)
-            glyph.style = this._shift ? SHIFT_GLYPH_ON : SHIFT_GLYPH;
+            glyph.style = shiftGlyphStyle(this._shift, this._scale);
         for (const {name, btn, minW} of this._modButtons)
-            btn.style = keyStyle(this._modActive(name) ? 'on' : 'mod', minW);
+            btn.style = keyStyle(
+                this._modActive(name) ? 'on' : 'mod', minW, this._scale);
     }
 
     // ---- visibility ---------------------------------------------------
     _toggleCollapse() {
         if (!this._rowsBox)
             return;
+        const [, oldHeight] = this._box ? this._box.get_size() : [0, 0];
         const show = !this._rowsBox.visible;
         this._rowsBox.visible = show;
         if (this._collapseBtn) {
@@ -523,14 +674,11 @@ export default class ErhaiOSK extends Extension {
             if (label)
                 label.text = show ? 'v' : '^';
         }
-        GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
-            if (this._box)
-                this._applyPosition(this._posX, this._posY);
-            return GLib.SOURCE_REMOVE;
-        });
+        this._reflow(oldHeight);
     }
 
     _setVisible(visible, writeState = true) {
+        const [, oldHeight] = this._box ? this._box.get_size() : [0, 0];
         this._hidden = !visible;
         if (this._box)
             this._box.visible = visible;
@@ -545,11 +693,7 @@ export default class ErhaiOSK extends Extension {
             this._qsToggle.checked = visible;
         if (writeState && this._readState() !== visible)
             this._writeState(visible);
-        GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
-            if (this._box)
-                this._applyPosition(this._posX, this._posY);
-            return GLib.SOURCE_REMOVE;
-        });
+        this._reflow(oldHeight);
     }
 
     // ---- shared on/off state (app icon <-> extension) -----------------
@@ -674,9 +818,9 @@ export default class ErhaiOSK extends Extension {
             return;
         this._placed = true;
 
-        const saved = this._loadPosition();
+        const saved = this._savedConfig ?? this._loadConfig();
         if (saved)
-            this._applyPosition(saved[0], saved[1]);
+            this._applyPosition(saved.x, saved.y);
         else
             this._placeDefault();
         log(`erhai-osk: placed at ${this._posX},${this._posY} size ${w}x${h}`);
@@ -772,39 +916,57 @@ export default class ErhaiOSK extends Extension {
             this._grabId = 0;
         }
         if (this._box)
-            this._savePosition(this._posX, this._posY);
+            this._saveConfig();
     }
 
-    // ---- position persistence ----------------------------------------
+    // ---- config persistence (position + size) ------------------------
     _posPath() {
         return GLib.build_filenamev([GLib.get_user_config_dir(), POS_FILE]);
     }
 
-    _loadPosition() {
+    // Returns {x, y, size} -- `size` is null for files written before the size
+    // selector existed, which the caller turns into DEFAULT_SIZE.
+    _loadConfig() {
         try {
             const path = this._posPath();
             if (!GLib.file_test(path, GLib.FileTest.EXISTS))
                 return null;
             const kf = new GLib.KeyFile();
             kf.load_from_file(path, GLib.KeyFileFlags.NONE);
-            return [kf.get_integer('position', 'x'),
-                kf.get_integer('position', 'y')];
+            let size = null;
+            try {
+                if (kf.get_groups().includes('layout'))
+                    size = kf.get_string('layout', 'size');
+            } catch (e) { /* group missing in older files */ }
+            return {
+                x: kf.get_integer('position', 'x'),
+                y: kf.get_integer('position', 'y'),
+                size,
+            };
         } catch (e) {
-            log(`erhai-osk: load position failed: ${e}`);
+            log(`erhai-osk: load config failed: ${e}`);
         }
         return null;
     }
 
-    _savePosition(x, y) {
+    // One KeyFile holds both groups: writing a fresh file with only the
+    // position would silently drop the remembered size (and vice versa).
+    _saveConfig() {
         try {
             const path = this._posPath();
             GLib.mkdir_with_parents(GLib.path_get_dirname(path), 0o755);
             const kf = new GLib.KeyFile();
-            kf.set_integer('position', 'x', Math.round(x));
-            kf.set_integer('position', 'y', Math.round(y));
+            kf.set_integer('position', 'x', Math.round(this._posX));
+            kf.set_integer('position', 'y', Math.round(this._posY));
+            kf.set_string('layout', 'size', this._sizeName || DEFAULT_SIZE);
             kf.save_to_file(path);
+            this._savedConfig = {
+                x: Math.round(this._posX),
+                y: Math.round(this._posY),
+                size: this._sizeName || DEFAULT_SIZE,
+            };
         } catch (e) {
-            log(`erhai-osk: save position failed: ${e}`);
+            log(`erhai-osk: save config failed: ${e}`);
         }
     }
 

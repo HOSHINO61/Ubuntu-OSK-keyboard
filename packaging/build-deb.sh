@@ -36,6 +36,9 @@ cp "$ROOT/scripts/opd2413-keyboard.desktop" \
    "$STAGE/usr/share/applications/opd2413-keyboard.desktop"
 
 # dpkg-deb preserves the tree's modes, so set them explicitly.
+# The DEBIAN directory itself must be 0755: a tree that came in from Windows or
+# from a FAT/exFAT volume arrives as 0707, and dpkg-deb refuses to build.
+chmod 755 "$STAGE/DEBIAN"
 chmod 755 "$STAGE/usr/bin/opd2413-keyboard"
 chmod 755 "$STAGE/DEBIAN/postinst" "$STAGE/DEBIAN/postrm"
 chmod 644 "$STAGE/usr/share/applications/opd2413-keyboard.desktop"

@@ -90,6 +90,7 @@ GNOME Shell 进程
 |---|---|
 | 显示/隐藏 | 系统菜单「屏幕键盘」/ 应用抽屉 `OPD2413-Keyboard` / 键盘上的 `✕` |
 | 收起成细条 | 拖动条 `⌄` / `⌃` |
+| 键盘尺寸 | 拖动条右侧 `小` `中` `大`（三档，跨登录记忆） |
 | 拖动定位 | 按住拖动条 `⠿ 拖动`（位置跨登录记忆） |
 | 中/英切换 | 右下 `中/英` 键 |
 | 粘滞修饰键 | `Ctrl` `Alt` `⊞` `Shift` `Caps`（点一次作用于下一个键） |
@@ -106,15 +107,25 @@ Shift   z x c v b n m  ,<  .>  /?                    ↑  Shift
 Ctrl  Alt  ⊞        [     空格     ]   中/英  Ctrl  ← ↓ →
 ```
 
-尺寸按老年用户标准：字母键 64px 宽、字号 24px，面板约 **1310×487**
-（逻辑分辨率 1734×1213）。
+尺寸可三档切换（拖动条右侧 `小` `中` `大`）：
+
+| 档位 | 缩放 | 字号 | 字母键宽 | 面板约 |
+|---|---|---|---|---|
+| 小 | 0.80 | 19px | 51px | 1050×390 |
+| 中（默认） | 1.00 | 24px | 64px | 1310×487 |
+| 大 | 1.28 | 31px | 82px | 1680×623 |
+
+中档按老年用户标准设计（字号 24px、字母键 64px），逻辑分辨率 1734×1213。
+切换时**就地重排、不重建按键**（重建会让正在按下的触摸落到别的键上，产生杂字符），
+底边保持不动，所以键盘向上生长、不会跑出屏幕。尺寸与位置一起存在
+`~/.config/erhai-osk/position.kf` 的 `[position]` 与 `[layout]` 两组里。
 
 ---
 
 ## 安装
 
 ```bash
-sudo apt install ./dist/opd2413-keyboard_1.0_arm64.deb
+sudo apt install ./dist/opd2413-keyboard_1.1_arm64.deb
 ```
 
 装完**注销重新登录一次**（GNOME 只在 shell 启动时扫描扩展目录）。
@@ -133,7 +144,7 @@ sudo apt remove opd2413-keyboard
 用户配置 `~/.config/erhai-osk/`（位置、开关状态）会保留。
 
 > 若机器上装过旧的 `1.0.0` 包，`1.0` 会被 dpkg 视为降级，需要
-> `sudo apt install -y --allow-downgrades ./dist/opd2413-keyboard_1.0_arm64.deb`。
+> `sudo apt install -y --allow-downgrades ./dist/opd2413-keyboard_1.1_arm64.deb`。
 
 ### 从源码构建
 
@@ -141,7 +152,7 @@ sudo apt remove opd2413-keyboard
 
 ```bash
 sh packaging/build-deb.sh
-# → dist/opd2413-keyboard_1.0_arm64.deb
+# → dist/opd2413-keyboard_1.1_arm64.deb
 ```
 
 版本号与架构都取自 `packaging/opd2413-keyboard/DEBIAN/control`，
