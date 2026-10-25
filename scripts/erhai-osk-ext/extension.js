@@ -71,7 +71,7 @@ const COLORS = {
 //
 //     scale 0.72 -> 927x349  (55%)
 //     scale 0.85 -> 1120x421 (66%)
-//     scale 0.99 -> ~1293x475 (76%)
+//     scale 0.99 -> 1295x491 (76%)
 //
 // The panel grows roughly linearly with the factor, but not exactly: at some
 // sizes a text label ('Shift', 'Ctrl') is wider than the key's min-width and
