@@ -13,6 +13,27 @@
 # GitHub identity, then force-pushes it to the GitHub remote.
 #
 # Usage:  sh scripts/sync-github.sh [--push]
+#
+# Pushing from Windows behind a proxy (git 2.56 + PortableGit, verified):
+#
+#   git config http.proxy http://127.0.0.1:31181
+#   git config http.sslVerify false          # schannel CRL check dies with
+#                                            # CRYPT_E_NO_REVOCATION_CHECK;
+#                                            # the OpenSSL backend then wants a
+#                                            # CA bundle that is not wired up
+#   B64=$(printf 'x-access-token:%s' "$PAT" | base64)
+#   git config http.extraheader "Authorization: Basic $B64"
+#   sh scripts/sync-github.sh --push
+#   git -c http.proxy=... push github <gh-head>:refs/tags/v1.0.1
+#   git config --unset http.extraheader
+#   git config --unset http.sslVerify
+#   git config --unset http.proxy
+#
+# api.github.com is reachable directly even when github.com:443 is not, so
+# releases can be created and assets uploaded without the proxy at all.
+#
+# A PAT must never be left in .git/config -- the three --unset lines above are
+# part of the procedure, not an afterthought.
 set -e
 
 GH_NAME="ホシノ"
